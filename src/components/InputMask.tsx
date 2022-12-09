@@ -1,10 +1,9 @@
 import { Clock } from "phosphor-react";
-import { HTMLAttributes, InputHTMLAttributes, KeyboardEvent } from "react";
+import { InputHTMLAttributes, KeyboardEvent } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 
 interface InputMaskProps extends InputHTMLAttributes<HTMLInputElement> {
   register: UseFormRegisterReturn;
-  //   disabledClock?:
 }
 
 export function InputMask({ register, ...rest }: InputMaskProps) {

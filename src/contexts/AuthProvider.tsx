@@ -1,13 +1,7 @@
 import { useAuthUser } from "@react-query-firebase/auth";
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  Auth,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useEffect, useState } from "react";
-import { useQuery } from "react-query";
+import { createContext, ReactNode, useState } from "react";
 import { api } from "../services/api";
 import { auth, provider, signOut } from "../services/firebase/auth";
 
@@ -51,7 +45,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return router.push("/");
       }
 
-      const { uid, displayName, email, photoURL } = data;
+      const { uid } = data;
 
       const result = await getUserById(uid);
 

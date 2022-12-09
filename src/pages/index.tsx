@@ -1,9 +1,8 @@
-import { GoogleLogo, Power } from "phosphor-react";
-import { InputMask } from "../components/InputMask";
+import { GoogleLogo } from "phosphor-react";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
-  const { onSignInWithGoogle, isLoading, user, onSignOut } = useAuth();
+  const { onSignInWithGoogle, isLoading, user } = useAuth();
 
   if (isLoading || user) {
     return <h1>Carregando...</h1>;

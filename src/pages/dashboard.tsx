@@ -4,19 +4,10 @@ import { Header } from "../components/Dashboard/Header";
 import { Table } from "../components/Dashboard/Table";
 import { useAuth } from "../hooks/useAuth";
 import { useTime } from "../hooks/useTime";
-import { api } from "../services/api";
 
 export default function Dashboard() {
   const { isLoading, user } = useAuth();
   const { isLoadingPoints } = useTime();
-
-  async function getPoints() {
-    const response = await api.get(
-      `/api/point/getByDate?userId=213&year=2022&month=11`
-    );
-
-    console.log("Point", response);
-  }
 
   if (isLoading || !user) {
     return <h1>Carregando...</h1>;

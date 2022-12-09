@@ -1,6 +1,5 @@
 import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt";
-import { ClipboardText, Trash } from "phosphor-react";
 import { useTime } from "../../hooks/useTime";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
 import { ModalInfoPoint } from "../modals/ModalInfoPoint";
@@ -107,7 +106,6 @@ export function Table() {
         </thead>
         <tbody className="text-sm text-slate-300">
           {points.map((point) => {
-            console.log("pointt", point);
             return <TRow key={point.id} point={point} />;
           })}
         </tbody>

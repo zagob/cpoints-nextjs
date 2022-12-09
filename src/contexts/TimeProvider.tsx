@@ -1,11 +1,10 @@
 import { format } from "date-fns";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
-import { useQuery, QueriesObserver } from "react-query";
+import { useQuery } from "react-query";
 import { DataFormProps } from "../components/Dashboard/AsideAddPoint";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../services/api";
-import { queryClient } from "../services/reactQuery";
 
 interface TimeContextProps {
   onSetDateSelected: (date: Date) => void;

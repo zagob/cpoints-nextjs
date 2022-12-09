@@ -103,8 +103,6 @@ export default async function handler(
         )
       );
 
-      console.log("minutesAfternoon", minutesAfternoon);
-
       const bonusTimePoint =
         minutesMorning + minutesAfternoon - totalHoursInMinutes;
 

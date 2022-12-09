@@ -1,7 +1,5 @@
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
-import { useAuth } from "../../hooks/useAuth";
-import { useQuery } from "react-query";
 import { useTime } from "../../hooks/useTime";
 
 const ChartAp = dynamic(() => import("react-apexcharts"), {
@@ -9,7 +7,6 @@ const ChartAp = dynamic(() => import("react-apexcharts"), {
 });
 
 export function Chart() {
-  const { user } = useAuth();
   const { allMinutesMonthChart } = useTime();
 
   const options: ApexOptions = {
