@@ -2,6 +2,7 @@ import { useAuthUser } from "@react-query-firebase/auth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useState } from "react";
+import toast from "react-hot-toast";
 import { api } from "../services/api";
 import { auth, provider, signOut } from "../services/firebase/auth";
 
@@ -15,6 +16,7 @@ interface AuthContextProps {
   onSetUserInfo: (dataUserInfo: InfoUserProps) => Promise<void>;
   user: UserProps | null;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 interface InfoUserProps {
@@ -40,6 +42,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserProps | null>(null);
   const { data, isLoading } = useAuthUser(["user"], auth, {
     onSuccess: async (data) => {
+      console.log('dataaaa', !!data)
       if (!data) {
         setUser(null);
         return router.push("/");
@@ -49,6 +52,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const result = await getUserById(uid);
 
+      console.log('result',result)
+
       if (!result) {
         await onSignOut();
         return;
@@ -56,8 +61,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(result);
 
       router.push("/dashboard");
+
+      return data;
     },
   });
+
+  const isAuthenticated = user !== null;
+
+  console.log('data',data)
+  console.log('isAuthenticated',isAuthenticated)
 
   async function onSignOut() {
     await signOut(auth);
@@ -71,7 +83,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         const { displayName, email, photoURL, uid } = result.user;
 
-        const userData = {
+        let userData = {
           id: uid,
           email,
           name: displayName,
@@ -81,15 +93,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         const { data } = await api.get(`/api/user/existUser?id=${uid}`);
 
+        console.log('data Login', data)
         if (!data) {
           await api.post("/api/user/createUser", userData);
           setUser(userData);
           return;
         }
-
-        setUser(userData);
+        const { data: dataUserInfo } = await api.get(`/api/user/getUser?id=${uid}`)
+        setUser(dataUserInfo);
       })
-      .catch((error) => {});
+      .catch((error) => {}).finally(() => {
+        toast.success('Authenticado')
+      })
   }
 
   async function onSetUserInfo(dataUserInfo: InfoUserProps) {
@@ -108,7 +123,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ onSignInWithGoogle, onSignOut, user, isLoading, onSetUserInfo }}
+      value={{ onSignInWithGoogle, onSignOut, user, isLoading, onSetUserInfo, isAuthenticated }}
     >
       {children}
     </AuthContext.Provider>

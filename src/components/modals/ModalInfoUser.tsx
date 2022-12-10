@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../services/api";
+import { Button } from "../Button";
 import { InputMask } from "../InputMask";
 import { ModalRadix } from "../ModalRadix";
 
@@ -95,9 +96,9 @@ export function ModalInfoUser() {
           <InputMask id="totalHours" register={register("totalHours")} />
         </div>
 
-        <button type="submit">
+        <Button statusColor="green" type="submit">
           {user?.infoUser ? "Atualizar" : "Adicionar"}
-        </button>
+        </Button>
       </form>
     </ModalRadix>
   );

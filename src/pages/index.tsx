@@ -2,10 +2,10 @@ import { GoogleLogo } from "phosphor-react";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
-  const { onSignInWithGoogle, isLoading, user } = useAuth();
+  const { onSignInWithGoogle, isLoading, user, isAuthenticated } = useAuth();
 
-  if (isLoading || user) {
-    return <h1>Carregando...</h1>;
+  if (isLoading && !isAuthenticated) {
+    return <h1>Carregando...asdasd</h1>;
   }
 
   return (

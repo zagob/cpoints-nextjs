@@ -153,7 +153,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
         allMinutesMonthChart,
       }}
     >
-      {children}
+       {children}
     </TimeContext.Provider>
   );
 }
