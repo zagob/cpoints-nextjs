@@ -12,7 +12,7 @@ export function Chart() {
   const options: ApexOptions = {
     chart: {
       toolbar: {
-        show: true,
+        show: false,
       },
       zoom: {
         enabled: false,
@@ -27,8 +27,8 @@ export function Chart() {
     },
     // colors: ["#000"],
     tooltip: {
-      enabled: true,
-      fillSeriesColor: true,
+      enabled: false,
+      fillSeriesColor: false,
     },
     xaxis: {
       type: "datetime",
