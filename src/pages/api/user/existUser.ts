@@ -23,7 +23,7 @@ export default async function handler(
 
       res.status(200).json(false);
     } catch (err) {
-      res.status(400).json({ message: "Fail to create User" });
+      res.status(400).json({ message: "Fail to create User", err });
     }
   }
 }

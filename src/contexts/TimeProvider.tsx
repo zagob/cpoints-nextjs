@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { createContext, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
@@ -5,6 +6,7 @@ import { useQuery } from "react-query";
 import { DataFormProps } from "../components/Dashboard/AsideAddPoint";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../services/api";
+import { auth } from "../services/firebase/auth";
 
 interface TimeContextProps {
   onSetDateSelected: (date: Date) => void;
@@ -60,14 +62,17 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
   const [year, month] = monthSelected.split("/");
   const { refetch, isLoading: isLoadingPoints } = useQuery({
-    queryKey: ["getPointByDate", monthSelected],
+    queryKey: ["getPointByDate", user, monthSelected],
     queryFn: async () => {
+      if (user === null) {
+        return;
+      }
       const result = await api.get(
         `/api/point/getByDate?userId=${user?.id}&year=${year}&month=${month}`
       );
       return result;
     },
-    onSuccess: ({ data }) => {
+    onSuccess: ({ data }: AxiosResponse) => {
       setPoints(data.points);
       setBonusTotalMinutes(data.bonusTotalMinutes);
     },
@@ -153,7 +158,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
         allMinutesMonthChart,
       }}
     >
-       {children}
+      {children}
     </TimeContext.Provider>
   );
 }

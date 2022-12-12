@@ -1,10 +1,12 @@
 import { useAuthUser } from "@react-query-firebase/auth";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "../services/api";
 import { auth, provider, signOut } from "../services/firebase/auth";
+import { db } from "../services/firebase/firestore";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -17,6 +19,7 @@ interface AuthContextProps {
   user: UserProps | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  messageAuth: string | null;
 }
 
 interface InfoUserProps {
@@ -39,78 +42,84 @@ export const AuthContext = createContext({} as AuthContextProps);
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
+  const [messageAuth, setMessageAuth] = useState<string | null>(null);
   const [user, setUser] = useState<UserProps | null>(null);
   const { data, isLoading } = useAuthUser(["user"], auth, {
     onSuccess: async (data) => {
-      console.log('dataaaa', !!data)
       if (!data) {
+        setMessageAuth(null);
         setUser(null);
-        return router.push("/");
-      }
-
-      const { uid } = data;
-
-      const result = await getUserById(uid);
-
-      console.log('result',result)
-
-      if (!result) {
-        await onSignOut();
+        router.push("/");
         return;
       }
-      setUser(result);
-
+      setMessageAuth("Entrando...");
+      const { uid, displayName, photoURL, email } = data;
+      const dataUser = {
+        id: uid,
+        name: displayName,
+        avatar_url: photoURL,
+        email,
+        infoUser: null,
+      };
+      console.log("uid", uid);
+      const { data: existUserById } = await api.get(
+        `/api/user/existUser?id=${uid}`
+      );
+      if (!existUserById) {
+        if (uid) {
+          await setDoc(doc(db, "users", uid), dataUser);
+          // await api
+          //   .post("/api/user/createUser", dataUser)
+          //   .then(() => {
+          //     setMessageAuth("Criando usuário...");
+          //     setUser(dataUser);
+          //   })
+          //   .finally(() => {
+          //     // setMessageAuth("Authenticado");
+          //     router.push("/dashboard");
+          //   });
+          setMessageAuth("Criando usuário...");
+          setUser(dataUser);
+          router.push("/dashboard");
+          return;
+        }
+      }
+      const { data: dataUserInfo } = await api.get(
+        `/api/user/getUser?id=${uid}`
+      );
+      console.log("dataUserInfo", dataUserInfo);
+      setUser(dataUserInfo);
+      // setMessageAuth("Authenticado");
       router.push("/dashboard");
-
       return data;
     },
   });
 
   const isAuthenticated = user !== null;
 
-  console.log('data',data)
-  console.log('isAuthenticated',isAuthenticated)
-
   async function onSignOut() {
     await signOut(auth);
   }
 
   async function onSignInWithGoogle() {
-    signInWithPopup(auth, provider)
-      .then(async (result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        // const token = credential?.accessToken;
+    setMessageAuth("Login...");
 
-        const { displayName, email, photoURL, uid } = result.user;
+    const { user } = await signInWithPopup(auth, provider);
 
-        let userData = {
-          id: uid,
-          email,
-          name: displayName,
-          avatar_url: photoURL,
-          infoUser: null,
-        };
-
-        const { data } = await api.get(`/api/user/existUser?id=${uid}`);
-
-        console.log('data Login', data)
-        if (!data) {
-          await api.post("/api/user/createUser", userData);
-          setUser(userData);
-          return;
-        }
-        const { data: dataUserInfo } = await api.get(`/api/user/getUser?id=${uid}`)
-        setUser(dataUserInfo);
-      })
-      .catch((error) => {}).finally(() => {
-        toast.success('Authenticado')
-      })
+    if (!user) {
+      return;
+    }
   }
 
   async function onSetUserInfo(dataUserInfo: InfoUserProps) {
-    const result = (await getUserById(data?.uid!)) as UserProps;
+    // console.log("dataUserInfo", dataUserInfo);
+    const result = await getUserById(data?.uid!);
 
     setUser(result);
+
+    // await updateDoc(doc(db, "users", user?.id!), {
+    //   infoUser: dataUserInfo,
+    // });
   }
 
   async function getUserById(uid: string) {
@@ -123,7 +132,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ onSignInWithGoogle, onSignOut, user, isLoading, onSetUserInfo, isAuthenticated }}
+      value={{
+        onSignInWithGoogle,
+        onSignOut,
+        user,
+        isLoading,
+        onSetUserInfo,
+        isAuthenticated,
+        messageAuth,
+      }}
     >
       {children}
     </AuthContext.Provider>

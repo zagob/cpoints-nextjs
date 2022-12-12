@@ -30,7 +30,7 @@ export function ModalInfoUser() {
   });
 
   async function handleSubmitForm(data: ModalInfoUserProps) {
-    await api.put(`/api/user/${user?.id}`, data);
+    await api.put(`/api/user/${user?.id!}`, data);
     toast.success(
       `Informações ${
         user?.infoUser ? "atualizadas" : "adicionadas"

@@ -6,6 +6,10 @@ module.exports = {
       fontFamily: {
         sans: ["Roboto Mono", "sans"],
       },
+      animation: {
+        "bounce-slow": "bounce 1.2s linear infinite",
+        "bounce-slow-2": "bounce 1.3s linear infinite",
+      },
     },
   },
   plugins: [],

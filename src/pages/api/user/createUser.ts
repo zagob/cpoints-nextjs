@@ -20,12 +20,12 @@ export default async function handler(
   const { id, avatar_url, email, name } = bodyDataUser.parse(req.body);
 
   try {
-    const docRef = doc(db, "users", id);
-    const docSnap = await getDoc(docRef);
+    // const docRef = doc(db, "users", id);
+    // const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      return res.status(404).json({ message: "Already exist user id" });
-    }
+    // if (docSnap.exists()) {
+    //   return res.status(404).json({ message: "Already exist user id" });
+    // }
 
     await setDoc(doc(db, "users", id), {
       id,

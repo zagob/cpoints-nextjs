@@ -20,22 +20,26 @@ const bodyInfoUser = z.object({
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse
 ) {
   if (req.method === "PUT") {
     const { id } = paramIdUser.parse(req.query);
     const { entryOne, entryTwo, exitOne, exitTwo, totalHours } =
       bodyInfoUser.parse(req.body);
-    await updateDoc(doc(db, "users", id), {
-      infoUser: {
-        entryOne,
-        entryTwo,
-        exitOne,
-        exitTwo,
-        totalHours,
-      },
-    });
+    try {
+      await updateDoc(doc(db, `users`, id), {
+        infoUser: {
+          entryOne,
+          entryTwo,
+          exitOne,
+          exitTwo,
+          totalHours,
+        },
+      });
 
-    res.status(201).json({ message: "Info User create success" });
+      res.status(201).json({ message: "Info User create success" });
+    } catch (err) {
+      res.status(404).json({ message: "Error", err });
+    }
   }
 }
