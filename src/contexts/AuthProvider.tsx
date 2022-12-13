@@ -1,12 +1,11 @@
 import { useAuthUser } from "@react-query-firebase/auth";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import { signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useState } from "react";
-import toast from "react-hot-toast";
-import { api } from "../services/api";
+
 import { auth, provider, signOut } from "../services/firebase/auth";
-import { db } from "../services/firebase/firestore";
+import { createUser } from "../services/firebase/firestore/user/createUser";
+import { existUserIdById } from "../services/firebase/firestore/user/existUserById";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -61,35 +60,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email,
         infoUser: null,
       };
-      console.log("uid", uid);
-      const { data: existUserById } = await api.get(
-        `/api/user/existUser?id=${uid}`
-      );
-      if (!existUserById) {
+      const { success, data: user } = await existUserIdById(uid);
+
+      if (!success) {
         if (uid) {
-          await setDoc(doc(db, "users", uid), dataUser);
-          // await api
-          //   .post("/api/user/createUser", dataUser)
-          //   .then(() => {
-          //     setMessageAuth("Criando usuário...");
-          //     setUser(dataUser);
-          //   })
-          //   .finally(() => {
-          //     // setMessageAuth("Authenticado");
-          //     router.push("/dashboard");
-          //   });
+          await createUser(uid, {
+            avatar_url: photoURL,
+            email,
+            name: displayName,
+          });
           setMessageAuth("Criando usuário...");
           setUser(dataUser);
           router.push("/dashboard");
           return;
         }
       }
-      const { data: dataUserInfo } = await api.get(
-        `/api/user/getUser?id=${uid}`
-      );
-      console.log("dataUserInfo", dataUserInfo);
-      setUser(dataUserInfo);
-      // setMessageAuth("Authenticado");
+      setUser(user!);
       router.push("/dashboard");
       return data;
     },
@@ -112,22 +98,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function onSetUserInfo(dataUserInfo: InfoUserProps) {
-    // console.log("dataUserInfo", dataUserInfo);
-    const result = await getUserById(data?.uid!);
+    if (!user?.id) {
+      return;
+    }
+    const { data } = await existUserIdById(user.id);
 
-    setUser(result);
-
-    // await updateDoc(doc(db, "users", user?.id!), {
-    //   infoUser: dataUserInfo,
-    // });
-  }
-
-  async function getUserById(uid: string) {
-    try {
-      const response = await api.get(`/api/user/getUser?id=${uid}`);
-
-      return response.data;
-    } catch (err) {}
+    setUser(data as UserProps);
   }
 
   return (

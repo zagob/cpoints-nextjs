@@ -12,7 +12,7 @@ import {
   where,
   serverTimestamp,
 } from "firebase/firestore";
-import { app } from ".";
+import { app } from "../index";
 
 const db = getFirestore(app);
 

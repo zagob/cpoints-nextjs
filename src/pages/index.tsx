@@ -2,8 +2,7 @@ import { GoogleLogo } from "phosphor-react";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
-  const { onSignInWithGoogle, isLoading, user, isAuthenticated, messageAuth } =
-    useAuth();
+  const { onSignInWithGoogle, messageAuth } = useAuth();
 
   return (
     <div className="h-screen flex items-center justify-center">

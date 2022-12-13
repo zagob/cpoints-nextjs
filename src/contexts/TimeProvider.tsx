@@ -1,12 +1,14 @@
-import { AxiosResponse } from "axios";
 import { format } from "date-fns";
 import { createContext, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
 import { useQuery } from "react-query";
 import { DataFormProps } from "../components/Dashboard/AsideAddPoint";
 import { useAuth } from "../hooks/useAuth";
-import { api } from "../services/api";
-import { auth } from "../services/firebase/auth";
+import { createPoint } from "../services/firebase/firestore/point/createPoint";
+import { deletePoint } from "../services/firebase/firestore/point/deletePoint";
+import { getAllMonthTotalMinutes } from "../services/firebase/firestore/point/getAllMonthTotalMinutes";
+import { getByDate } from "../services/firebase/firestore/point/getByDate";
+import { existUserIdById } from "../services/firebase/firestore/user/existUserById";
 
 interface TimeContextProps {
   onSetDateSelected: (date: Date) => void;
@@ -67,29 +69,30 @@ export function TimeProvider({ children }: TimeProviderProps) {
       if (user === null) {
         return;
       }
-      const result = await api.get(
-        `/api/point/getByDate?userId=${user?.id}&year=${year}&month=${month}`
-      );
+      const result = await getByDate(user.id, month, year);
+
       return result;
     },
-    onSuccess: ({ data }: AxiosResponse) => {
-      setPoints(data.points);
-      setBonusTotalMinutes(data.bonusTotalMinutes);
+    onSuccess: (data: { bonusTotalMinutes: number; points: [] }) => {
+      if (data) {
+        setPoints(data.points);
+        setBonusTotalMinutes(data.bonusTotalMinutes);
+      }
     },
     enabled: !!user,
     refetchOnWindowFocus: false,
   });
 
   const { refetch: refetchAllMonth } = useQuery({
-    queryKey: ["getAllMonth"],
+    queryKey: ["getAllMonth", year],
     queryFn: async () => {
-      const result = await api.get(
-        `/api/point/getAllMonthBonusTotalMinutes?userId=${user?.id}&year=${year}`
-      );
+      console.log("carregando");
+      const result = await getAllMonthTotalMinutes(user?.id!, year);
 
       return result;
     },
-    onSuccess: ({ data }) => {
+    onSuccess: (data: number[]) => {
+      console.log("carregou");
       setAllMinutesMonthChart(data);
     },
     enabled: !!user,
@@ -105,6 +108,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
   }
 
   async function onAddPointTime(data: DataFormProps) {
+    const idUser = user?.id!;
     const dateIsoString = dateSelected.toISOString();
 
     const [getYearMonthDate] = dateIsoString.split("T");
@@ -118,11 +122,22 @@ export function TimeProvider({ children }: TimeProviderProps) {
       return;
     }
 
-    await api.post(`/api/point/create?idUser=${user?.id}`, {
+    const result = await existUserIdById(idUser);
+
+    if (!result.data?.infoUser) {
+      toast.error("Usuario não encontrado");
+      return;
+    }
+
+    const totalHours = result.data?.infoUser?.totalHours;
+
+    const dataPoint = {
       ...data,
       dateTime: monthSelected,
       created_at: dateIsoString,
-    });
+    };
+
+    await createPoint(idUser, dataPoint, totalHours);
 
     refetch();
     refetchAllMonth();
@@ -132,12 +147,18 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
   async function onDeletePoint(id: string) {
     try {
-      const { data } = await api.delete(`/api/point/${id}?userId=${user?.id}`);
-
-      if (data.message === "Point delete success") {
-        toast.success("Ponto deletado com sucesso!");
-        setPoints((oldState) => oldState.filter((point) => point.id !== id));
+      if (!user?.id) {
+        toast.error("Nenhum id do Usuário encontrado");
+        return;
       }
+      const data = await deletePoint(user.id, id);
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      toast.success(data.message);
+      setPoints((oldState) => oldState.filter((point) => point.id !== id));
     } catch (err) {
       toast.error("Erro ao deletar ponto, Tente novamente!");
     }

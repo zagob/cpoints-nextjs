@@ -2,6 +2,7 @@ import { AsideAddPoint } from "../components/Dashboard/AsideAddPoint";
 import { Chart } from "../components/Dashboard/Chart";
 import { Header } from "../components/Dashboard/Header";
 import { Table } from "../components/Dashboard/Table";
+import { Loading } from "../components/Loading";
 import { useAuth } from "../hooks/useAuth";
 import { useTime } from "../hooks/useTime";
 
@@ -9,8 +10,8 @@ export default function Dashboard() {
   const { isLoading, user } = useAuth();
   const { isLoadingPoints } = useTime();
 
-  if (isLoading || !user) {
-    return <h1>Carregando...</h1>;
+  if (isLoadingPoints || !user) {
+    return <Loading />;
   }
 
   return (

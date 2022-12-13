@@ -1,9 +1,11 @@
+import { doc, updateDoc } from "firebase/firestore";
 import { Pencil, UserList } from "phosphor-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../services/api";
+import { db } from "../../services/firebase/firestore";
 import { Button } from "../Button";
 import { InputMask } from "../InputMask";
 import { ModalRadix } from "../ModalRadix";
@@ -30,7 +32,9 @@ export function ModalInfoUser() {
   });
 
   async function handleSubmitForm(data: ModalInfoUserProps) {
-    await api.put(`/api/user/${user?.id!}`, data);
+    await updateDoc(doc(db, `users`, user?.id!), {
+      infoUser: data,
+    });
     toast.success(
       `Informações ${
         user?.infoUser ? "atualizadas" : "adicionadas"
