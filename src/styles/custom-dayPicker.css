@@ -1,20 +1,13 @@
-root {
+.rdp {
   --rdp-cell-size: 40px;
   --rdp-accent-color: #0000ff;
-  --rdp-background-color: #000;
-  /* Switch to dark colors for dark themes */
+  --rdp-background-color: #e7edff;
   --rdp-accent-color-dark: #3003e1;
   --rdp-background-color-dark: #180270;
-  /* Outline border for focused elements */
-  --rdp-outline: 2px solid var(--rdp-accent-color);
-  /* Outline border for focused and selected elements */
-  --rdp-outline-selected: 1px solid rgba(0, 0, 0, 0.75);
-}
+  --rdp-outline: 2px solid var(--rdp-accent-color); /* Outline border for focused elements */
+  --rdp-outline-selected: 3px solid var(--rdp-accent-color); /* Outline border for focused _and_ selected elements */
 
-.rdp {
-  width: 360px;
-  height: 320px;
-  @apply bg-zinc-900 flex justify-center my-4 rounded-md;
+  margin: 1em;
 }
 
 /* Hide elements for devices that are not screen readers */
@@ -45,7 +38,6 @@ root {
   padding: 0;
   cursor: default;
   color: inherit;
-  outline: none;
   background: none;
   font: inherit;
 
@@ -53,28 +45,32 @@ root {
   -webkit-appearance: none;
 }
 
+.rdp-button_reset:focus-visible {
+  /* Make sure to reset outline only when :focus-visible is supported */
+  outline: none;
+}
+
 .rdp-button {
   border: 2px solid transparent;
 }
 
-.rdp-button[aria-disabled="true"] {
+.rdp-button[disabled]:not(.rdp-day_selected) {
   opacity: 0.25;
-  pointer-events: none;
 }
 
-.rdp-button:not([aria-disabled="true"]) {
+.rdp-button:not([disabled]) {
   cursor: pointer;
+  @apply rounded-none;
 }
 
-.rdp-button:focus,
-.rdp-button:active {
-  /* color: inherit;
+.rdp-button:focus-visible:not([disabled]) {
+  color: inherit;
+  background-color: var(--rdp-background-color);
   border: var(--rdp-outline);
-  background-color: var(--rdp-background-color); */
 }
 
-.rdp-button:hover:not([aria-disabled="true"]) {
-  @apply border border-blue-400;
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  @apply bg-transparent text-green-400;
 }
 
 .rdp-months {
@@ -91,6 +87,7 @@ root {
 
 .rdp-month:last-child {
   margin-right: 0;
+  @apply bg-zinc-900 p-2 rounded-lg border border-zinc-700;
 }
 
 .rdp-table {
@@ -137,6 +134,7 @@ root {
   font-family: inherit;
   font-size: 140%;
   font-weight: bold;
+  background: transparent;
 }
 
 .rdp-nav {
@@ -176,8 +174,7 @@ root {
   position: relative;
   display: inline-flex;
   align-items: center;
-  /* border: 1px solid red;
-  background: red; */
+  background: transparent;
 }
 
 .rdp-dropdown {
@@ -204,11 +201,10 @@ root {
   color: unset;
 }
 
-.rdp-dropdown:focus:not([disabled]) + .rdp-caption_label,
-.rdp-dropdown:active:not([disabled]) + .rdp-caption_label {
-  /* border: var(--rdp-outline); */
+.rdp-dropdown:focus-visible:not([disabled]) + .rdp-caption_label {
+  background-color: var(--rdp-background-color);
+  border: var(--rdp-outline);
   border-radius: 6px;
-  /* background-color: var(--rdp-background-color); */
 }
 
 .rdp-dropdown_icon {
@@ -249,7 +245,6 @@ root {
   height: var(--rdp-cell-size);
   padding: 0;
   text-align: center;
-  @apply border border-gray-700;
 }
 
 .rdp-weeknumber {
@@ -268,24 +263,28 @@ root {
   height: var(--rdp-cell-size);
   margin: 0;
   border: 2px solid transparent;
-  /* border-radius: 100%; */
+  border-radius: 100%;
 }
 
 .rdp-day_today:not(.rdp-day_outside) {
-  /* font-weight: bold; */
-  @apply font-bold text-green-500;
+  font-weight: bold;
 }
 
-.rdp-day_selected:not([aria-disabled="true"]),
-.rdp-day_selected:focus:not([aria-disabled="true"]),
-.rdp-day_selected:active:not([aria-disabled="true"]),
-.rdp-day_selected:hover:not([aria-disabled="true"]) {
-  /* color: white; */
-  @apply bg-blue-500 text-gray-100;
+.rdp-day_selected,
+.rdp-day_selected:focus-visible,
+.rdp-day_selected:hover {
+  @apply text-green-500 bg-transparent cursor-default;
 }
 
-.rdp-day_selected:focus:not([aria-disabled="true"]) {
-  /* border: var(--rdp-outline-selected); */
+.rdp-day_outside {
+  opacity: 0.5;
+}
+
+.rdp-day_selected:focus-visible {
+  /* Since the background is the same use again the outline */
+  outline: var(--rdp-outline);
+  outline-offset: 2px;
+  z-index: 1;
 }
 
 .rdp:not([dir="rtl"]) .rdp-day_range_start:not(.rdp-day_range_end) {
