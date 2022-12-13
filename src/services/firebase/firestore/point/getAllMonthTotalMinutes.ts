@@ -1,4 +1,4 @@
-import { MessageErr } from "../../../../pages/errors/returnMessageError";
+import { MessageErr } from "../../../../errors/returnMessageError";
 import { query, collection, where, getDocs, db } from "../index";
 
 export async function getAllMonthTotalMinutes(idUser: string, year: string) {

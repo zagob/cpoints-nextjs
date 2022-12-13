@@ -1,4 +1,4 @@
-import { MessageErr } from "../../../../pages/errors/returnMessageError";
+import { MessageErr } from "../../../../errors/returnMessageError";
 import { query, collection, where, db, getDocs } from "../index";
 import { existUserIdById } from "../user/existUserById";
 

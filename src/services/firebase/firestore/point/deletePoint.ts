@@ -1,4 +1,4 @@
-import { MessageErr } from "../../../../pages/errors/returnMessageError";
+import { MessageErr } from "../../../../errors/returnMessageError";
 import { deleteDoc, doc, db } from "../index";
 
 export async function deletePoint(idUser: string, idPoint: string) {
