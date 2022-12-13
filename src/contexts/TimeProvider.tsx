@@ -158,7 +158,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
       }
 
       toast.success(data.message);
-      setPoints((oldState) => oldState.filter((point) => point.id !== id));
+      refetch();
     } catch (err) {
       toast.error("Erro ao deletar ponto, Tente novamente!");
     }

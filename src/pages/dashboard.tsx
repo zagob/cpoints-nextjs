@@ -10,7 +10,7 @@ export default function Dashboard() {
   const { isLoading, user } = useAuth();
   const { isLoadingPoints } = useTime();
 
-  if (isLoadingPoints || !user) {
+  if (isLoading || !user) {
     return <Loading />;
   }
 
