@@ -21,7 +21,7 @@ interface ModalInfoUserProps {
 export function ModalInfoUser() {
   const { user, onSetUserInfo } = useAuth();
   const [modal, setModal] = useState(false);
-  const { handleSubmit, register } = useForm<ModalInfoUserProps>({
+  const { handleSubmit, register, setValue } = useForm<ModalInfoUserProps>({
     defaultValues: {
       entryOne: user?.infoUser?.entryOne,
       exitOne: user?.infoUser?.exitOne,
@@ -73,31 +73,61 @@ export function ModalInfoUser() {
           <label htmlFor="entryOne" className="w-[140px] text-right">
             Entrada 1:
           </label>
-          <InputMask id="entryOne" register={register("entryOne")} />
+          <InputMask
+            id="entryOne"
+            register={register("entryOne")}
+            onResetValue={() => {
+              setValue("entryOne", "");
+            }}
+          />
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="exitOne" className="w-[140px] text-right">
             Saída 1:
           </label>
-          <InputMask id="exitOne" register={register("exitOne")} />
+          <InputMask
+            id="exitOne"
+            register={register("exitOne")}
+            onResetValue={() => {
+              setValue("exitOne", "");
+            }}
+          />
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="entryTwo" className="w-[140px] text-right">
             Entrada 2:
           </label>
-          <InputMask id="entryTwo" register={register("entryTwo")} />
+          <InputMask
+            id="entryTwo"
+            register={register("entryTwo")}
+            onResetValue={() => {
+              setValue("entryTwo", "");
+            }}
+          />
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="exitTwo" className="w-[140px] text-right">
             Saída 2:
           </label>
-          <InputMask id="exitTwo" register={register("exitTwo")} />
+          <InputMask
+            id="exitTwo"
+            register={register("exitTwo")}
+            onResetValue={() => {
+              setValue("exitTwo", "");
+            }}
+          />
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="totalHours" className="w-[140px] text-right">
             Total Horas:
           </label>
-          <InputMask id="totalHours" register={register("totalHours")} />
+          <InputMask
+            id="totalHours"
+            register={register("totalHours")}
+            onResetValue={() => {
+              setValue("totalHours", "");
+            }}
+          />
         </div>
 
         <Button statusColor="green" type="submit">

@@ -25,7 +25,7 @@ interface ModalInfoPointProps {
 }
 
 export function ModalInfoPoint({ point }: ModalInfoPointProps) {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const [modal, setModal] = useState(false);
 
   async function handleSubmitForm() {}
@@ -51,22 +51,46 @@ export function ModalInfoPoint({ point }: ModalInfoPointProps) {
         <div className="flex justify-center gap-10">
           <div>
             <label htmlFor="entryOne">Entrada 1:</label>
-            <InputMask id="entryOne" register={register("entryOne")} />
+            <InputMask
+              id="entryOne"
+              register={register("entryOne")}
+              onResetValue={() => {
+                setValue("entryOne", "");
+              }}
+            />
           </div>
           <div>
             <label htmlFor="exitOne">Saída 1:</label>
-            <InputMask id="exitOne" register={register("exitOne")} />
+            <InputMask
+              id="exitOne"
+              register={register("exitOne")}
+              onResetValue={() => {
+                setValue("exitOne", "");
+              }}
+            />
           </div>
         </div>
 
         <div className="flex justify-center gap-10">
           <div>
             <label htmlFor="entryTwo">Entrada 2:</label>
-            <InputMask id="entryTwo" register={register("entryTwo")} />
+            <InputMask
+              id="entryTwo"
+              register={register("entryTwo")}
+              onResetValue={() => {
+                setValue("entryTwo", "");
+              }}
+            />
           </div>
           <div>
             <label htmlFor="exitTwo">Saída 2:</label>
-            <InputMask id="exitTwo" register={register("exitTwo")} />
+            <InputMask
+              id="exitTwo"
+              register={register("exitTwo")}
+              onResetValue={() => {
+                setValue("exitTwo", "");
+              }}
+            />
           </div>
         </div>
 

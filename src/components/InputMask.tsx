@@ -24,7 +24,6 @@ export function InputMask({ register, onResetValue, ...rest }: InputMaskProps) {
     onResetValue();
   }
 
-  console.log("value", value);
   return (
     <div className="text-gray-100 relative group-[disabled] w-[110px] flex items-center rounded">
       <input
