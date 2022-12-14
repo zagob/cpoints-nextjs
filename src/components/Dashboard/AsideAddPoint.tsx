@@ -80,12 +80,12 @@ export function AsideAddPoint() {
         fromYear={2020}
         footer={`Data Selecionada: ${format(
           new Date(dateSelected),
-          "yyyy/MM/dd"
+          "dd/MM/yyyy"
         )}`}
         styles={{
           tfoot: {
             height: "30px",
-            fontSize: "14px",
+            fontSize: "0.85rem",
           },
         }}
       />
@@ -140,13 +140,6 @@ export function AsideAddPoint() {
           >
             Enviar
           </Button>
-          {/* <button
-            type="submit"
-            disabled={!user?.infoUser}
-            className="mt-8 bg-green-600 rounded w-[260px] p-2 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            Enviar
-          </button> */}
         </div>
       </form>
     </div>
