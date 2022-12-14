@@ -3,6 +3,7 @@ import { ButtonHTMLAttributes, ReactNode } from "react";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   statusColor: "red" | "green" | "gray";
+  classNameStyle?: string;
   isLoading?: boolean;
   titleLoading?: string;
 }
@@ -12,6 +13,7 @@ export function Button({
   statusColor,
   isLoading,
   titleLoading,
+  classNameStyle,
   ...rest
 }: ButtonProps) {
   return (
@@ -20,7 +22,7 @@ export function Button({
         statusColor === "red" && "bg-red-500"
       } ${statusColor === "green" && "bg-green-500"} ${
         statusColor === "gray" && "bg-gray-500"
-      } transition-all hover:brightness-75 rounded disabled:brightness-50 disabled:cursor-not-allowed`}
+      } transition-all hover:brightness-75 rounded disabled:brightness-50 disabled:cursor-not-allowed ${classNameStyle}`}
       {...rest}
     >
      {isLoading ? <>

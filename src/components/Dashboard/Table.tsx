@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt";
 import { useTime } from "../../hooks/useTime";
+import { EmptyDataTable } from "../EmptyDataTable";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
 import { ModalInfoPoint } from "../modals/ModalInfoPoint";
 
@@ -88,10 +89,12 @@ export function Table() {
   }
 
   if (points.length === 0) {
-    return <div>Nenhum dado encontrado</div>;
+    return <EmptyDataTable />;
   }
+
   return (
-    <div className="overflow-auto">
+    <div className="bg-zinc-800 flex-1">
+        <div className="overflow-auto">
       <table className="table-fixed border-collapse rounded-lg w-full">
         <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
           <tr>
@@ -110,6 +113,7 @@ export function Table() {
           })}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

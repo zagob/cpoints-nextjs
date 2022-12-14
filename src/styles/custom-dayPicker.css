@@ -190,10 +190,11 @@
   cursor: inherit;
   opacity: 0;
   border: none;
-  background-color: transparent;
+  /* background-color: transparent; */
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  @apply bg-zinc-700 text-gray-100 text-base
 }
 
 .rdp-dropdown[disabled] {

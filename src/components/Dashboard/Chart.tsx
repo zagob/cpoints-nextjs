@@ -77,7 +77,7 @@ export function Chart() {
     },
   ];
   return (
-    <div>
+    <div className="bg-zinc-800 h-[280px]">
       <ChartAp options={options} series={series} type="area" height={250} />
     </div>
   );

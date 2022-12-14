@@ -8,6 +8,7 @@ import ptBr from "date-fns/locale/pt";
 import { useTime } from "../../hooks/useTime";
 import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 import { Clock } from "phosphor-react";
+import { Button } from "../Button";
 
 export interface DataFormProps {
   entryOne: string;
@@ -131,13 +132,21 @@ export function AsideAddPoint() {
         </div>
 
         <div className="flex justify-center">
-          <button
+          <Button
+            type="submit"
+            disabled={!user?.infoUser}
+            classNameStyle="w-full mx-10"
+            statusColor="green"
+          >
+            Enviar
+          </Button>
+          {/* <button
             type="submit"
             disabled={!user?.infoUser}
             className="mt-8 bg-green-600 rounded w-[260px] p-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Enviar
-          </button>
+          </button> */}
         </div>
       </form>
     </div>
