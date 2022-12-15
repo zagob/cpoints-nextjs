@@ -12,9 +12,13 @@ export async function getAllMonthTotalMinutes(idUser: string, year: string) {
       const querySnapshot = await getDocs(q);
       const data = querySnapshot.docs;
 
-      const totalMinutes = data
+      const filterRemoveHoliday = data.filter(
+        (item) => item.data().holiday !== true
+      );
+
+      const totalMinutes = filterRemoveHoliday
         .map((item) => {
-          const { bankBalance } = item.data();
+          const { bankBalance, holiday } = item.data();
 
           const [hour, minute] = bankBalance.bonusTimePoint
             .split(":")

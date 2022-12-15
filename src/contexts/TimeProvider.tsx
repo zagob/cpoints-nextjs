@@ -44,6 +44,7 @@ interface PointsProps {
   exitTwo: string;
   dateTime: string;
   created_at: Date;
+  holiday: boolean;
   bankBalance: BankBalanceProps;
 }
 
@@ -157,8 +158,8 @@ export function TimeProvider({ children }: TimeProviderProps) {
         throw new Error(data.message);
       }
 
-      toast.success(data.message);
       refetch();
+      toast.success(data.message);
     } catch (err) {
       toast.error("Erro ao deletar ponto, Tente novamente!");
     }

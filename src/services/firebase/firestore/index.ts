@@ -11,6 +11,7 @@ import {
   addDoc,
   where,
   serverTimestamp,
+  orderBy,
 } from "firebase/firestore";
 import { app } from "../index";
 
@@ -29,4 +30,5 @@ export {
   addDoc,
   deleteDoc,
   serverTimestamp,
+  orderBy,
 };

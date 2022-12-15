@@ -16,6 +16,7 @@ const DataPointSchema = z.object({
   exitTwo: z.string(),
   dateTime: z.string(),
   created_at: z.string(),
+  holiday: z.boolean(),
 });
 
 type CreatePointProps = z.infer<typeof DataPointSchema>;
@@ -25,7 +26,15 @@ export async function createPoint(
   point: CreatePointProps,
   totalHours: string
 ) {
-  const { created_at, dateTime, entryOne, entryTwo, exitOne, exitTwo } = point;
+  const {
+    created_at,
+    dateTime,
+    entryOne,
+    entryTwo,
+    exitOne,
+    exitTwo,
+    holiday,
+  } = point;
 
   const validadeDate = Date.parse(created_at);
 
@@ -106,16 +115,11 @@ export async function createPoint(
     created_at,
     dateTime,
     bankBalance,
+    holiday,
   });
 
   await updateDoc(doc(db, `users/${idUser}/points`, response.id), {
     id: response.id,
-    entryOne,
-    entryTwo,
-    exitOne,
-    exitTwo,
-    dateTime,
-    bankBalance,
   });
 
   const data = {
@@ -125,6 +129,7 @@ export async function createPoint(
     exitTwo,
     dateTime,
     bankBalance,
+    holiday,
   };
 
   return {

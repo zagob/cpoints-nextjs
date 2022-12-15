@@ -1,26 +1,41 @@
-import { MessageErr } from "../../../../errors/returnMessageError";
-import { query, collection, where, db, getDocs } from "../index";
-import { existUserIdById } from "../user/existUserById";
+import { query, collection, where, db, getDocs, orderBy } from "../index";
 
 export async function getByDate(idUser: string, month: string, year: string) {
-  const user = await existUserIdById(idUser);
-
-  // if (!user.success) {
-  //   return MessageErr(false, "Usuário não encontrado");
-  // }
-
   const q = query(
     collection(db, `users/${idUser}/points`),
     where("dateTime", "==", `${year}/${month}`)
   );
 
+  const queryOrderBy = query(
+    collection(db, `users/${idUser}/points`),
+    orderBy("created_at", "asc")
+  );
+
+  const querySnapshotOrderBy = await getDocs(queryOrderBy);
+
+  const dataOrderBy = querySnapshotOrderBy.docs
+    .map((item) => {
+      const dataOrderBy = item.data();
+
+      return dataOrderBy;
+    })
+    .filter((item) => item.dateTime === `${year}/${month}`);
+
   const querySnapshot = await getDocs(q);
 
   const data = querySnapshot.docs;
 
-  const bonusTotalMinutes = data
+  const filterRemoveHoliday = data
     .map((item) => {
-      const { bankBalance } = item.data();
+      const data = item.data();
+
+      return data;
+    })
+    .filter((item) => item.holiday !== true);
+
+  const bonusTotalMinutes = filterRemoveHoliday
+    .map((item) => {
+      const { bankBalance } = item;
 
       const [hour, minute] = bankBalance.bonusTimePoint
         .split(":")
@@ -44,18 +59,5 @@ export async function getByDate(idUser: string, month: string, year: string) {
       return acc;
     }, 0);
 
-  const points = data.map((item) => {
-    const data = item.data();
-
-    return {
-      ...data,
-    };
-  });
-
-  return { bonusTotalMinutes, points };
-  // try {
-
-  // } catch (err) {
-  //   return MessageErr(false, "Erro ao filtrar dados");
-  // }
+  return { bonusTotalMinutes, points: dataOrderBy };
 }

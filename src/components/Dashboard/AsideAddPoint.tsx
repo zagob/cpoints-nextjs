@@ -6,18 +6,18 @@ import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import ptBr from "date-fns/locale/pt";
 import { useTime } from "../../hooks/useTime";
-import { TimeMinutesToString } from "../../utils/timeMinutesToString";
-import { Clock } from "phosphor-react";
 import { Button } from "../Button";
+import { z } from "zod";
 
-export interface DataFormProps {
-  entryOne: string;
-  exitOne: string;
-  entryTwo: string;
-  exitTwo: string;
-  holiday: boolean;
-}
+const DataFormSchema = z.object({
+  entryOne: z.string(),
+  exitOne: z.string(),
+  entryTwo: z.string(),
+  exitTwo: z.string(),
+  holiday: z.boolean(),
+});
 
+export type DataFormProps = z.infer<typeof DataFormSchema>;
 interface ClockTimeStatusProps {
   bonusTotalMinutesStatus: number;
   hours: string;
@@ -129,6 +129,8 @@ export function AsideAddPoint() {
     watch("exitOne").length === 5 &&
     watch("exitTwo").length === 5;
 
+  const isHoliday = watch("holiday");
+
   return (
     <div className="bg-zinc-800 w-[380px] flex flex-col items-center pt-4">
       <ClockTimeStatus
@@ -183,6 +185,7 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="entryOne"
               register={register("entryOne")}
+              disabledInput={isHoliday}
             />
           </div>
           <div>
@@ -191,6 +194,7 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="exitOne"
               register={register("exitOne")}
+              disabledInput={isHoliday}
             />
           </div>
         </div>
@@ -202,6 +206,7 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="entryTwo"
               register={register("entryTwo")}
+              disabledInput={isHoliday}
             />
           </div>
           <div>
@@ -210,6 +215,7 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="exitTwo"
               register={register("exitTwo")}
+              disabledInput={isHoliday}
             />
           </div>
         </div>
@@ -221,9 +227,7 @@ export function AsideAddPoint() {
         <div className="flex justify-center w-full">
           <Button
             type="submit"
-            disabled={
-              !user?.infoUser || (!isValueHasString && !watch("holiday"))
-            }
+            disabled={!user?.infoUser || (isValueHasString && isHoliday)}
             classNameStyle="w-full"
             statusColor="green"
           >

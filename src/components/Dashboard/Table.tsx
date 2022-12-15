@@ -19,6 +19,7 @@ export interface TRowPointProps {
     exitTwo: string;
     dateTime: string;
     created_at: Date;
+    holiday: boolean;
     bankBalance: {
       timeMorning: string;
       lunch: string;
@@ -43,6 +44,7 @@ function TRow({ point }: TRowPointProps) {
     entryTwo,
     exitOne,
     exitTwo,
+    holiday,
     bankBalance: { lunch, totalTimePoint, statusPoint, bonusTimePoint },
   } = point;
 
@@ -53,7 +55,11 @@ function TRow({ point }: TRowPointProps) {
   const lunchTime = `${exitOne} - ${entryTwo} (${lunch})`;
 
   return (
-    <tr className="bg-slate-800 border-b border-b-slate-700 font-light">
+    <tr
+      className={`bg-slate-800 border-b border-b-slate-700 font-light ${
+        holiday && "opacity-70 bg-slate-900"
+      }`}
+    >
       <td className="py-1 px-6">{date}</td>
       <td className="py-1 px-6">{entryOne}</td>
       <td className="py-1 px-6">{lunchTime}</td>
@@ -65,8 +71,10 @@ function TRow({ point }: TRowPointProps) {
           className={`w-2 h-2 rounded-full ${
             statusPoint === "UP"
               ? "bg-green-400"
-              : statusPoint === "DOWN"
+              : statusPoint === "DOWN" && !holiday
               ? "bg-red-400"
+              : holiday
+              ? "bg-blue-600"
               : "bg-gray-400"
           }`}
         />
@@ -93,27 +101,25 @@ export function Table() {
   }
 
   return (
-    <div className="bg-zinc-800 flex-1">
-      <div className="overflow-auto">
-        <table className="table-fixed border-collapse rounded-lg w-full">
-          <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
-            <tr>
-              <THead title="Data" classNameString="w-[295px]" />
-              <THead title="Entrada" />
-              <THead title="Almoço" classNameString="w-[250px]" />
-              <THead title="Saída" />
-              <THead title="Total Horas" />
-              <THead title="Bonús" />
-              <THead title="Ações" />
-            </tr>
-          </thead>
-          <tbody className="text-sm text-slate-300">
-            {points.map((point) => {
-              return <TRow key={point.id} point={point} />;
-            })}
-          </tbody>
-        </table>
-      </div>
+    <div className="bg-zinc-800 h-[420px] overflow-auto">
+      <table className="border-collapse rounded-lg w-full">
+        <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
+          <tr>
+            <THead title="Data" classNameString="w-[295px]" />
+            <THead title="Entrada" />
+            <THead title="Almoço" classNameString="w-[250px]" />
+            <THead title="Saída" />
+            <THead title="Total Horas" />
+            <THead title="Bonús" />
+            <THead title="Ações" />
+          </tr>
+        </thead>
+        <tbody className="text-sm text-slate-300">
+          {points.map((point) => {
+            return <TRow key={point.id} point={point} />;
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

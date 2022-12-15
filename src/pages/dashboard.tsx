@@ -15,6 +15,42 @@ export default function Dashboard() {
     return <Loading />;
   }
 
+  // return (
+  //   <div className="h-screen flex flex-col gap-2 p-2">
+  //     <div className="bg-zinc-800 flex-1 overflow-auto">
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //       <div>{"asd".repeat(20)}</div>
+  //     </div>
+  //     <div className="bg-zinc-800 h-[300px]">asd</div>
+  //   </div>
+  // );
+
   return (
     <div className="h-screen flex flex-col">
       <Header />
