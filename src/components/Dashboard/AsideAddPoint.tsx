@@ -56,7 +56,7 @@ function ClockTimeStatus({
         className={`absolute w-2 h-[2px] left-6 top-1 rounded-l-sm rounded-r-sm ${stylesClassBackground}`}
       />
       <span className="text-lg">{hours}</span>
-      <div className="flex flex-col justify-center gap-1 mt-1">
+      <div className="flex flex-col items-center justify-center gap-1">
         <div className={`w-1 h-1 rounded ${stylesClassBackground}`} />
         <div className={`w-1 h-1 rounded ${stylesClassBackground}`} />
       </div>
