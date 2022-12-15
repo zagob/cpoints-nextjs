@@ -4,10 +4,9 @@ import { UseFormRegisterReturn } from "react-hook-form";
 
 interface InputMaskProps extends InputHTMLAttributes<HTMLInputElement> {
   register: UseFormRegisterReturn;
-  onResetValue: () => void;
 }
 
-export function InputMask({ register, onResetValue, ...rest }: InputMaskProps) {
+export function InputMask({ register, ...rest }: InputMaskProps) {
   const [value, setValue] = useState("");
 
   function handleKeyUpChange(event: KeyboardEvent<HTMLInputElement>) {
@@ -19,15 +18,10 @@ export function InputMask({ register, onResetValue, ...rest }: InputMaskProps) {
     setValue(value);
   }
 
-  function handleResetValue() {
-    setValue("");
-    onResetValue();
-  }
-
   return (
     <div className="text-gray-100 relative group-[disabled] w-[110px] flex items-center rounded">
       <input
-        className={`bg-transparent w-full outline-none py-2 px-4 placeholder:opacity-50 bg-zinc-900 disabled:opacity-50 rounded`}
+        className={`bg-transparent w-full outline-none py-2 px-4 placeholder:opacity-30 bg-zinc-900 disabled:opacity-50 rounded`}
         placeholder="23:59"
         onKeyUp={handleKeyUpChange}
         {...register}
@@ -43,7 +37,6 @@ export function InputMask({ register, onResetValue, ...rest }: InputMaskProps) {
         }`}
         size={24}
         weight="bold"
-        onClick={value.length >= 5 ? handleResetValue : () => {}}
       />
     </div>
   );

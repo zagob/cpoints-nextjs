@@ -29,64 +29,46 @@ function ClockTimeStatus({
   hours,
   minutes,
 }: ClockTimeStatusProps) {
+  const stylesClassBackground =
+    bonusTotalMinutesStatus === 1
+      ? "bg-green-400"
+      : bonusTotalMinutesStatus === -1
+      ? " bg-red-400"
+      : " bg-slate-400";
+
+  const stylesClassText =
+    bonusTotalMinutesStatus === 1
+      ? "text-green-400 border-green-400"
+      : bonusTotalMinutesStatus === -1
+      ? "text-red-400 border-red-400"
+      : "text-slate-400 border-slate-400";
   return (
     <div
-      className={`border-2 border-green-400 ${
-        bonusTotalMinutesStatus === 1
-          ? "border-green-700 text-green-400"
-          : bonusTotalMinutesStatus === -1
-          ? "border-red-700 text-red-400"
-          : "border-slate-700 text-slate-400"
-      } relative w-16 h-8 flex z-10 justify-center gap-1 items-center bg-zinc-900`}
+      className={`border-2 w-[80px] h-[38px] flex items-center justify-center gap-1 bg-zinc-900 rounded-md relative ${stylesClassText}`}
     >
       <div
-        className={`absolute w-2 h-1 -top-1 left-2 ${
-          bonusTotalMinutesStatus === 1
-            ? "bg-green-400"
-            : bonusTotalMinutesStatus === -1
-            ? " bg-red-400"
-            : " bg-slate-400"
-        }`}
+        className={`absolute w-6 h-1 rounded-t-md -top-[6px] right-2 ${stylesClassBackground}`}
       />
-      <span className="text-center">{hours}</span>
-      <div className="flex flex-col gap-1">
-        <div
-          className={`w-1 h-1 rounded-full animate-pulse ${
-            bonusTotalMinutesStatus === 1
-              ? "bg-green-400"
-              : bonusTotalMinutesStatus === -1
-              ? " bg-red-400"
-              : " bg-slate-400"
-          }`}
-        />
-        <div
-          className={`w-1 h-1 rounded-full animate-pulse ${
-            bonusTotalMinutesStatus === 1
-              ? "bg-green-400"
-              : bonusTotalMinutesStatus === -1
-              ? " bg-red-400"
-              : " bg-slate-400"
-          }`}
-        />
+      <div
+        className={`absolute w-2 h-[2px] left-3 top-1 rounded-l-sm rounded-r-sm ${stylesClassBackground}`}
+      />
+      <div
+        className={`absolute w-2 h-[2px] left-6 top-1 rounded-l-sm rounded-r-sm ${stylesClassBackground}`}
+      />
+      <span className="text-lg">{hours}</span>
+      <div className="flex flex-col justify-center gap-1 mt-1">
+        <div className={`w-1 h-1 rounded ${stylesClassBackground}`} />
+        <div className={`w-1 h-1 rounded ${stylesClassBackground}`} />
       </div>
-      <span className="text-center">{minutes}</span>
+      <span className="text-lg">{minutes}</span>
       <div
-        className={`absolute w-[10px] h-[1px] -rotate-45 left-0 -bottom-[6px] z-0 ${
-          bonusTotalMinutesStatus === 1
-            ? "bg-green-400"
-            : bonusTotalMinutesStatus === -1
-            ? " bg-red-400"
-            : " bg-slate-400"
-        }`}
+        className={`absolute w-full h-[1px] bottom-1 ${stylesClassBackground}`}
       />
       <div
-        className={`absolute w-[10px] h-[1px] rotate-45 right-0 -bottom-[6px] z-0 ${
-          bonusTotalMinutesStatus === 1
-            ? "bg-green-400"
-            : bonusTotalMinutesStatus === -1
-            ? " bg-red-400"
-            : " bg-slate-400"
-        }`}
+        className={`absolute w-2 h-[5px] border-b rounded-b-[3px] -bottom-[5px] left-2 ${stylesClassBackground}`}
+      />
+      <div
+        className={`absolute w-2 h-[5px] border-b rounded-b-[3px] -bottom-[5px] right-2 ${stylesClassBackground}`}
       />
     </div>
   );
@@ -154,19 +136,6 @@ export function AsideAddPoint() {
         hours={hours}
         minutes={minutes}
       />
-      {/* <span
-        className={`border mt-4 p-1 px-3 rounded bg-zinc-900 text-md flex items-center gap-2 ${
-          bonusTotalMinutesStatus === 1
-            ? "border-green-700 text-green-400"
-            : bonusTotalMinutesStatus === -1
-            ? "border-red-700 text-red-400"
-            : "border-slate-700 text-slate-400"
-        }`}
-      >
-        {bonusTotalMinutesStatus === -1 && "- "}
-        {TimeMinutesToString(Math.abs(bonusTotalMinutes))}
-        <Clock size={18} />
-      </span> */}
       <DayPicker
         locale={ptBr}
         mode="single"
@@ -214,9 +183,6 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="entryOne"
               register={register("entryOne")}
-              onResetValue={() => {
-                setValue("entryOne", "");
-              }}
             />
           </div>
           <div>
@@ -225,9 +191,6 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="exitOne"
               register={register("exitOne")}
-              onResetValue={() => {
-                setValue("exitOne", "");
-              }}
             />
           </div>
         </div>
@@ -239,9 +202,6 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="entryTwo"
               register={register("entryTwo")}
-              onResetValue={() => {
-                setValue("entryTwo", "");
-              }}
             />
           </div>
           <div>
@@ -250,9 +210,6 @@ export function AsideAddPoint() {
               disabled={!user?.infoUser}
               id="exitTwo"
               register={register("exitTwo")}
-              onResetValue={() => {
-                setValue("exitTwo", "");
-              }}
             />
           </div>
         </div>

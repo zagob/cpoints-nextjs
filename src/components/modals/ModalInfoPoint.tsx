@@ -51,46 +51,22 @@ export function ModalInfoPoint({ point }: ModalInfoPointProps) {
         <div className="flex justify-center gap-10">
           <div>
             <label htmlFor="entryOne">Entrada 1:</label>
-            <InputMask
-              id="entryOne"
-              register={register("entryOne")}
-              onResetValue={() => {
-                setValue("entryOne", "");
-              }}
-            />
+            <InputMask id="entryOne" register={register("entryOne")} />
           </div>
           <div>
             <label htmlFor="exitOne">Saída 1:</label>
-            <InputMask
-              id="exitOne"
-              register={register("exitOne")}
-              onResetValue={() => {
-                setValue("exitOne", "");
-              }}
-            />
+            <InputMask id="exitOne" register={register("exitOne")} />
           </div>
         </div>
 
         <div className="flex justify-center gap-10">
           <div>
             <label htmlFor="entryTwo">Entrada 2:</label>
-            <InputMask
-              id="entryTwo"
-              register={register("entryTwo")}
-              onResetValue={() => {
-                setValue("entryTwo", "");
-              }}
-            />
+            <InputMask id="entryTwo" register={register("entryTwo")} />
           </div>
           <div>
             <label htmlFor="exitTwo">Saída 2:</label>
-            <InputMask
-              id="exitTwo"
-              register={register("exitTwo")}
-              onResetValue={() => {
-                setValue("exitTwo", "");
-              }}
-            />
+            <InputMask id="exitTwo" register={register("exitTwo")} />
           </div>
         </div>
 
