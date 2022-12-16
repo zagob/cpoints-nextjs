@@ -77,8 +77,14 @@ export function Chart() {
     },
   ];
   return (
-    <div className="bg-zinc-800 flex-1">
-      <ChartAp options={options} series={series} type="area" height={250} />
+    <div className="bg-zinc-800 flex-1 rounded backdrop-blur-3xl py-10">
+      <ChartAp
+        options={options}
+        series={series}
+        type="area"
+        height="100%"
+        width="100%"
+      />
     </div>
   );
 }

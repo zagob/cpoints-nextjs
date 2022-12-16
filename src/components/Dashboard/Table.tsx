@@ -1,6 +1,9 @@
 import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt";
+import { useQuery } from "react-query";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useTime } from "../../hooks/useTime";
+import { useIs2XL, useIsXL } from "../../utils/mediaQueryHook";
 import { EmptyDataTable } from "../EmptyDataTable";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
 import { ModalInfoPoint } from "../modals/ModalInfoPoint";
@@ -36,6 +39,8 @@ function THead({ title, classNameString }: THeadProps) {
 }
 
 function TRow({ point }: TRowPointProps) {
+  const isQuery2XL = useIs2XL();
+  const isQueryXL = useIsXL();
   const {
     dateTime,
     id,
@@ -48,23 +53,30 @@ function TRow({ point }: TRowPointProps) {
     bankBalance: { lunch, totalTimePoint, statusPoint, bonusTimePoint },
   } = point;
 
-  const date = format(new Date(created_at), "dd 'de' MMMM, EEEE", {
+  const dateLg = format(new Date(created_at), "dd 'de' MMMM, EEEE", {
     locale: ptBR,
   });
 
-  const lunchTime = `${exitOne} - ${entryTwo} (${lunch})`;
+  const dateMd = format(new Date(created_at), "dd/MM/yyyy", {
+    locale: ptBR,
+  });
+
+  const lunchTimeLg = `${exitOne} - ${entryTwo} (${lunch})`;
+  const lunchTimeMd = `(${lunch})`;
 
   return (
     <tr
       className={`bg-slate-800 border-b border-b-slate-700 font-light ${
-        holiday && "opacity-70 bg-slate-900"
-      }`}
+        !holiday && "hover:brightness-150 cursor-default"
+      } ${holiday && "opacity-70 bg-slate-900"}`}
     >
-      <td className="py-1 px-6">{date}</td>
-      <td className="py-1 px-6">{entryOne}</td>
-      <td className="py-1 px-6">{lunchTime}</td>
-      <td className="py-1 px-6">{exitTwo}</td>
-      <td className="py-1 px-6">{totalTimePoint}</td>
+      <td className="py-1 px-6">{isQuery2XL ? dateLg : dateMd}</td>
+      <td className="py-1 px-6 hidden lg:table-cell">{entryOne}</td>
+      <td className="py-1 px-6 hidden lg:table-cell">
+        {isQueryXL ? lunchTimeLg : lunchTimeMd}
+      </td>
+      <td className="py-1 px-6 hidden md:table-cell">{exitTwo}</td>
+      <td className="py-1 px-6 hidden sm:table-cell">{totalTimePoint}</td>
       <td className="py-1 px-6 flex items-center gap-2">
         {bonusTimePoint}
         <div
@@ -90,6 +102,8 @@ function TRow({ point }: TRowPointProps) {
 }
 
 export function Table() {
+  const isQueryXL = useIsXL();
+  const isQuery2XL = useIs2XL();
   const { points, isLoadingPoints } = useTime();
 
   if (isLoadingPoints) {
@@ -101,25 +115,31 @@ export function Table() {
   }
 
   return (
-    <div className="bg-zinc-800 h-[420px] overflow-auto">
-      <table className="border-collapse rounded-lg w-full">
-        <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
-          <tr>
-            <THead title="Data" classNameString="w-[295px]" />
-            <THead title="Entrada" />
-            <THead title="Almoço" classNameString="w-[250px]" />
-            <THead title="Saída" />
-            <THead title="Total Horas" />
-            <THead title="Bonús" />
-            <THead title="Ações" />
-          </tr>
-        </thead>
-        <tbody className="text-sm text-slate-300">
-          {points.map((point) => {
-            return <TRow key={point.id} point={point} />;
-          })}
-        </tbody>
-      </table>
-    </div>
+    <table className="border-collapse rounded-lg w-full">
+      <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
+        <tr>
+          <THead
+            title="Data"
+            classNameString={`${!isQuery2XL ? "w-[180px]" : "w-[295px]"} `}
+          />
+          <THead title="Entrada" classNameString="hidden lg:table-cell" />
+          <THead
+            title="Almoço"
+            classNameString={`${
+              isQueryXL ? "w-[250px]" : "w-[150px]"
+            } hidden lg:table-cell`}
+          />
+          <THead title="Saída" classNameString="hidden md:table-cell" />
+          <THead title="Total Horas" classNameString="hidden sm:table-cell" />
+          <THead title="Bonús" />
+          <THead title="Ações" />
+        </tr>
+      </thead>
+      <tbody className="text-sm text-slate-300">
+        {points.map((point) => {
+          return <TRow key={point.id} point={point} />;
+        })}
+      </tbody>
+    </table>
   );
 }

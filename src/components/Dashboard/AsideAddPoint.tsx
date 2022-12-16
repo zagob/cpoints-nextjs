@@ -1,4 +1,5 @@
 import { InputMask } from "../../components/InputMask";
+import * as Checkbox from "@radix-ui/react-checkbox";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -8,6 +9,7 @@ import ptBr from "date-fns/locale/pt";
 import { useTime } from "../../hooks/useTime";
 import { Button } from "../Button";
 import { z } from "zod";
+import { ArrowRight, Check, CheckSquare } from "phosphor-react";
 
 const DataFormSchema = z.object({
   entryOne: z.string(),
@@ -132,7 +134,7 @@ export function AsideAddPoint() {
   const isHoliday = watch("holiday");
 
   return (
-    <div className="bg-zinc-800 w-[380px] flex flex-col items-center pt-4">
+    <div className="bg-zinc-800 h-full w-full sm:w-[380px] flex flex-col items-center pt-4 rounded">
       <ClockTimeStatus
         bonusTotalMinutesStatus={bonusTotalMinutesStatus}
         hours={hours}
@@ -176,9 +178,9 @@ export function AsideAddPoint() {
       />
       <form
         onSubmit={handleSubmit(handleSubmitData)}
-        className="flex flex-col gap-6 px-2 w-[290px]"
+        className="flex flex-col gap-6 w-[290px]"
       >
-        <div className="flex justify-center gap-10">
+        <div className="flex justify-between items-center">
           <div>
             <label htmlFor="entryOne">Entrada 1:</label>
             <InputMask
@@ -188,6 +190,7 @@ export function AsideAddPoint() {
               disabledInput={isHoliday}
             />
           </div>
+          <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
           <div>
             <label htmlFor="exitOne">Saída 1:</label>
             <InputMask
@@ -199,7 +202,7 @@ export function AsideAddPoint() {
           </div>
         </div>
 
-        <div className="flex justify-center gap-10">
+        <div className="flex justify-between items-center">
           <div>
             <label htmlFor="entryTwo">Entrada 2:</label>
             <InputMask
@@ -209,6 +212,7 @@ export function AsideAddPoint() {
               disabledInput={isHoliday}
             />
           </div>
+          <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
           <div>
             <label htmlFor="exitTwo">Saída 2:</label>
             <InputMask
@@ -220,8 +224,23 @@ export function AsideAddPoint() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <input id="holiday" type="checkbox" {...register("holiday")} />
-          <label htmlFor="holiday">Feriado?</label>
+          <Checkbox.Root
+            className="bg-zinc-900 rounded-md w-6 p-4 h-6 flex justify-center items-center border border-zinc-700"
+            id="holiday"
+            {...register("holiday")}
+          >
+            <Checkbox.Indicator>
+              <Check size={22} className="text-green-500" weight="bold" />
+            </Checkbox.Indicator>
+          </Checkbox.Root>
+          <label
+            htmlFor="holiday"
+            className="cursor-pointer text-zinc-200 font-bold text-md"
+          >
+            Feriado?
+          </label>
+          {/* <input id="holiday" type="checkbox" {...register("holiday")} />
+          <label htmlFor="holiday">Feriado?</label> */}
         </div>
 
         <div className="flex justify-center w-full">

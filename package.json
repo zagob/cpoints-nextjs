@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-checkbox": "^1.0.1",
     "@radix-ui/react-dialog": "^1.0.2",
     "@react-query-firebase/auth": "^1.0.0-dev.2",
     "@types/node": "18.11.11",

@@ -1,3 +1,4 @@
+import { List } from "phosphor-react";
 import { AsideAddPoint } from "../components/Dashboard/AsideAddPoint";
 import { Chart } from "../components/Dashboard/Chart";
 import { Header } from "../components/Dashboard/Header";
@@ -15,49 +16,18 @@ export default function Dashboard() {
     return <Loading />;
   }
 
-  // return (
-  //   <div className="h-screen flex flex-col gap-2 p-2">
-  //     <div className="bg-zinc-800 flex-1 overflow-auto">
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //       <div>{"asd".repeat(20)}</div>
-  //     </div>
-  //     <div className="bg-zinc-800 h-[300px]">asd</div>
-  //   </div>
-  // );
-
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <main className="flex-1 flex gap-2 m-2">
+      <main className="flex-1 relative sm:flex gap-2 m-2">
+        <div className="absolute sm:hidden hover:brightness-110 cursor-pointer -right-2 bg-zinc-700 w-12 shadow-lg shadow-zinc-900 rounded-l-lg">
+          <List size={32} className="pl-1" />
+        </div>
         <AsideAddPoint />
-        <div className="flex-1 flex flex-col gap-2">
-          {isLoadingPoints ? <LoadingDataTable /> : <Table />}
+        <div className="hidden flex-1 sm:flex flex-col gap-2 h-full">
+          <div className="h-[450px] overflow-auto bg-zinc-800 rounded overflow-x-auto">
+            {isLoadingPoints ? <LoadingDataTable /> : <Table />}
+          </div>
           <Chart />
         </div>
       </main>
