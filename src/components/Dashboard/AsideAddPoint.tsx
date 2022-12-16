@@ -1,6 +1,6 @@
 import { InputMask } from "../../components/InputMask";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/useAuth";
 
 import { DayPicker } from "react-day-picker";
@@ -86,7 +86,7 @@ export function AsideAddPoint() {
     bonusTotalMinutes,
     onAddPointTime,
   } = useTime();
-  const { handleSubmit, register, setValue, reset, watch } =
+  const { handleSubmit, register, setValue, reset, watch, control } =
     useForm<DataFormProps>({
       defaultValues: {
         entryOne: "",
@@ -224,15 +224,22 @@ export function AsideAddPoint() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Checkbox.Root
-            className="bg-zinc-900 rounded-md w-6 p-4 h-6 flex justify-center items-center border border-zinc-700"
-            id="holiday"
-            {...register("holiday")}
-          >
-            <Checkbox.Indicator>
-              <Check size={22} className="text-green-500" weight="bold" />
-            </Checkbox.Indicator>
-          </Checkbox.Root>
+          <input type="checkbox" id="holiday" {...register("holiday")} />
+          {/* <Controller
+            name="holiday"
+            control={control}
+            render={({ field }) => (
+              <Checkbox.Root
+                className="bg-zinc-900 rounded-md w-6 p-4 h-6 flex justify-center items-center border border-zinc-700"
+                id="holiday"
+                {...field}
+              >
+                <Checkbox.Indicator>
+                  <Check size={22} className="text-green-500" weight="bold" />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+            )}
+          /> */}
           <label
             htmlFor="holiday"
             className="cursor-pointer text-zinc-200 font-bold text-md"
