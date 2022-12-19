@@ -1,5 +1,5 @@
 import { Clock } from "phosphor-react";
-import { InputHTMLAttributes, KeyboardEvent, useState } from "react";
+import { InputHTMLAttributes, KeyboardEvent, useEffect, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 
 interface InputMaskProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -23,11 +23,20 @@ export function InputMask({
     setValue(value);
   }
 
+  useEffect(() => {
+    if (disabledInput) {
+      setValue("");
+    }
+    return () => {};
+  }, [disabledInput]);
+
   return (
-    <div className="text-gray-100 relative group-[disabled] w-[110px] flex items-center rounded">
+    <div
+      className={`text-gray-100 relative group-[disabled] w-[110px] flex items-center rounded`}
+    >
       <fieldset disabled={disabledInput}>
         <input
-          className={`bg-transparent w-full outline-none py-2 px-4 placeholder:opacity-30 bg-zinc-900 disabled:opacity-50 rounded`}
+          className={`bg-transparent w-full outline-none py-2 px-4 placeholder:opacity-30 bg-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed rounded`}
           placeholder="23:59"
           onKeyUp={handleKeyUpChange}
           {...register}
@@ -35,7 +44,7 @@ export function InputMask({
         />
       </fieldset>
       <Clock
-        className={`absolute right-1 ${
+        className={`absolute right-1 ${disabledInput && "opacity-50"} ${
           value.length === 5 && value <= "23:59"
             ? "text-green-500"
             : value.length > 5 || value > "23:59"

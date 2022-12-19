@@ -79,6 +79,7 @@ function ClockTimeStatus({
 export function AsideAddPoint() {
   const { user } = useAuth();
   const [holiday, setHoliday] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     dateSelected,
     onSetDateSelected,
@@ -97,6 +98,7 @@ export function AsideAddPoint() {
   });
 
   async function handleSubmitData(data: DataFormProps) {
+    setLoading(true);
     if (holiday) {
       const dataTimeFormat = {
         entryOne: "00:00",
@@ -105,11 +107,13 @@ export function AsideAddPoint() {
         exitTwo: "00:00",
       };
       await onAddPointTime(dataTimeFormat, holiday);
+      setLoading(false);
       reset();
       return;
     }
 
     await onAddPointTime(data, holiday);
+    setLoading(false);
     reset();
   }
 
@@ -220,35 +224,54 @@ export function AsideAddPoint() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Checkbox.Root
-            id="holiday"
-            className="bg-zinc-900 rounded-md w-6 p-4 h-6 flex justify-center items-center border border-zinc-700"
-            checked={holiday}
-            onCheckedChange={(e: boolean) => {
-              setHoliday(e);
-            }}
-          >
-            <Checkbox.Indicator>
-              <Check size={22} className="text-green-500" weight="bold" />
-            </Checkbox.Indicator>
-          </Checkbox.Root>
-          <label
-            htmlFor="holiday"
-            className="cursor-pointer text-zinc-200 font-bold text-md "
-          >
-            Feriado?
-          </label>
+        <div className="flex items-center justify-between my-1">
+          <div className="flex items-center gap-2">
+            <Checkbox.Root
+              id="holiday"
+              className="bg-zinc-900 rounded-md w-3 h-3 p-3 flex justify-center items-center border border-zinc-700"
+              checked={holiday}
+              onCheckedChange={(e: boolean) => {
+                setHoliday(e);
+              }}
+            >
+              <Checkbox.Indicator>
+                <Check size={18} className="text-green-500" weight="bold" />
+              </Checkbox.Indicator>
+            </Checkbox.Root>
+            <label
+              htmlFor="holiday"
+              className="cursor-pointer text-zinc-200 font-bold text-md "
+            >
+              Feriado?
+            </label>
+          </div>
+
+          {isValueHasString && isHoliday && (
+            <div>
+              <button
+                className="text-red-600 hover:brightness-125 transition-all"
+                type="button"
+                onClick={() => reset()}
+              >
+                Limpar campos
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-center w-full">
           <Button
             type="submit"
-            disabled={!user?.infoUser || (isValueHasString && isHoliday)}
+            disabled={
+              !user?.infoUser ||
+              (isValueHasString && isHoliday) ||
+              (!isHoliday && !isValueHasString) ||
+              loading
+            }
             classNameStyle="w-full"
             statusColor="green"
           >
-            Enviar
+            {loading ? "Enviando..." : "Enviar"}
           </Button>
         </div>
       </form>
