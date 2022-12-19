@@ -25,9 +25,9 @@ export function ModalRadix({
         <button type="button">{buttonOpenModal}</button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-black opacity-50 inset-0 fixed z-20 " />
+        <Dialog.Overlay className="bg-black opacity-50 inset-0 fixed z-50" />
         <Dialog.Content
-          className={`fixed z-30 rounded gap-4 p-4 bg-zinc-700 shadow-md shadow-zinc-700 top-[50%] left-[50%] w-[400px] -translate-y-1/2 -translate-x-1/2 flex flex-col items-center animateModal ${classNameStyles}`}
+          className={`fixed z-50 rounded gap-4 p-4 bg-zinc-700 shadow-md shadow-zinc-700 top-[50%] left-[50%] w-[400px] -translate-y-1/2 -translate-x-1/2 flex flex-col items-center animateModal ${classNameStyles}`}
         >
           <Dialog.Title className="text-2xl mt-2">{title}</Dialog.Title>
           <div className="w-full flex-1 flex flex-col items-center">

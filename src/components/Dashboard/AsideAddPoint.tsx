@@ -1,6 +1,6 @@
 import { InputMask } from "../../components/InputMask";
 import * as Checkbox from "@radix-ui/react-checkbox";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useAuth } from "../../hooks/useAuth";
 
 import { DayPicker } from "react-day-picker";
@@ -9,14 +9,14 @@ import ptBr from "date-fns/locale/pt";
 import { useTime } from "../../hooks/useTime";
 import { Button } from "../Button";
 import { z } from "zod";
-import { ArrowRight, Check, CheckSquare } from "phosphor-react";
+import { ArrowRight, Check } from "phosphor-react";
+import { useState } from "react";
 
 const DataFormSchema = z.object({
   entryOne: z.string(),
   exitOne: z.string(),
   entryTwo: z.string(),
   exitTwo: z.string(),
-  holiday: z.boolean(),
 });
 
 export type DataFormProps = z.infer<typeof DataFormSchema>;
@@ -78,6 +78,7 @@ function ClockTimeStatus({
 
 export function AsideAddPoint() {
   const { user } = useAuth();
+  const [holiday, setHoliday] = useState(false);
   const {
     dateSelected,
     onSetDateSelected,
@@ -93,12 +94,10 @@ export function AsideAddPoint() {
         entryTwo: "",
         exitOne: "",
         exitTwo: "",
-        holiday: false,
       },
     });
 
   async function handleSubmitData(data: DataFormProps) {
-    const { holiday } = data;
     if (holiday) {
       const dataTimeFormat = {
         entryOne: "00:00",
@@ -131,7 +130,7 @@ export function AsideAddPoint() {
     watch("exitOne").length === 5 &&
     watch("exitTwo").length === 5;
 
-  const isHoliday = watch("holiday");
+  const isHoliday = holiday;
 
   return (
     <div className="flex flex-col h-full justify-center items-center">
@@ -224,30 +223,24 @@ export function AsideAddPoint() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <input type="checkbox" id="holiday" {...register("holiday")} />
-          {/* <Controller
-            name="holiday"
-            control={control}
-            render={({ field }) => (
-              <Checkbox.Root
-                className="bg-zinc-900 rounded-md w-6 p-4 h-6 flex justify-center items-center border border-zinc-700"
-                id="holiday"
-                {...field}
-              >
-                <Checkbox.Indicator>
-                  <Check size={22} className="text-green-500" weight="bold" />
-                </Checkbox.Indicator>
-              </Checkbox.Root>
-            )}
-          /> */}
+          <Checkbox.Root
+            id="holiday"
+            className="bg-zinc-900 rounded-md w-6 p-4 h-6 flex justify-center items-center border border-zinc-700"
+            checked={holiday}
+            onCheckedChange={(e: boolean) => {
+              setHoliday(e);
+            }}
+          >
+            <Checkbox.Indicator>
+              <Check size={22} className="text-green-500" weight="bold" />
+            </Checkbox.Indicator>
+          </Checkbox.Root>
           <label
             htmlFor="holiday"
-            className="cursor-pointer text-zinc-200 font-bold text-md"
+            className="cursor-pointer text-zinc-200 font-bold text-md "
           >
             Feriado?
           </label>
-          {/* <input id="holiday" type="checkbox" {...register("holiday")} />
-          <label htmlFor="holiday">Feriado?</label> */}
         </div>
 
         <div className="flex justify-center w-full">

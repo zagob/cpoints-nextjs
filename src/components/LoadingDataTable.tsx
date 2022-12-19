@@ -1,4 +1,4 @@
-import { CircleNotch, CirclesThree } from "phosphor-react";
+import { CircleNotch } from "phosphor-react";
 
 export function LoadingDataTable() {
   return (

@@ -1,7 +1,5 @@
 import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt";
-import { useQuery } from "react-query";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useTime } from "../../hooks/useTime";
 import { useIs2XL, useIsXL } from "../../utils/mediaQueryHook";
 import { EmptyDataTable } from "../EmptyDataTable";
@@ -114,22 +112,6 @@ export function Table() {
     return <EmptyDataTable />;
   }
 
-  // <THead
-  //           title="Data"
-  //           classNameString={`${!isQuery2XL ? "w-[180px]" : "w-[295px]"} `}
-  //         />
-  //         <THead title="Entrada" classNameString="hidden lg:table-cell" />
-  //         <THead
-  //           title="Almoço"
-  //           classNameString={`${
-  //             isQueryXL ? "w-[250px]" : "w-[150px]"
-  //           } hidden lg:table-cell`}
-  //         />
-  //         <THead title="Saída" classNameString="hidden md:table-cell" />
-  //         <THead title="Total Horas" classNameString="hidden sm:table-cell" />
-  //         <THead title="Bonús" />
-  //         <THead title="Ações" />
-
   return (
     <table className="table-auto w-full border-collapse rounded-lg text-left text-sm">
       <thead className="bg-slate-700 text-slate-400">
@@ -152,7 +134,7 @@ export function Table() {
         </tr>
       </thead>
       <tbody>
-      {points.map((point) => {
+        {points.map((point) => {
           return <TRow key={point.id} point={point} />;
         })}
       </tbody>
