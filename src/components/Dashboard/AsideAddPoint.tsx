@@ -87,15 +87,14 @@ export function AsideAddPoint() {
     bonusTotalMinutes,
     onAddPointTime,
   } = useTime();
-  const { handleSubmit, register, setValue, reset, watch, control } =
-    useForm<DataFormProps>({
-      defaultValues: {
-        entryOne: "",
-        entryTwo: "",
-        exitOne: "",
-        exitTwo: "",
-      },
-    });
+  const { handleSubmit, register, reset, watch } = useForm<DataFormProps>({
+    defaultValues: {
+      entryOne: "",
+      entryTwo: "",
+      exitOne: "",
+      exitTwo: "",
+    },
+  });
 
   async function handleSubmitData(data: DataFormProps) {
     if (holiday) {
@@ -104,14 +103,13 @@ export function AsideAddPoint() {
         exitOne: "00:00",
         entryTwo: "00:00",
         exitTwo: "00:00",
-        holiday,
       };
-      await onAddPointTime(dataTimeFormat);
+      await onAddPointTime(dataTimeFormat, holiday);
       reset();
       return;
     }
 
-    await onAddPointTime(data);
+    await onAddPointTime(data, holiday);
     reset();
   }
 

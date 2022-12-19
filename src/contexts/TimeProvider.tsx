@@ -13,7 +13,7 @@ import { existUserIdById } from "../services/firebase/firestore/user/existUserBy
 interface TimeContextProps {
   onSetDateSelected: (date: Date) => void;
   onSetMonthSelected: (date: Date) => void;
-  onAddPointTime: (data: DataFormProps) => Promise<void>;
+  onAddPointTime: (data: DataFormProps, holiday: boolean) => Promise<void>;
   onDeletePoint: (id: string) => Promise<void>;
   dateSelected: Date;
   monthSelected: string;
@@ -108,7 +108,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
     setMonthSelected(format(new Date(date), "yyyy/MM"));
   }
 
-  async function onAddPointTime(data: DataFormProps) {
+  async function onAddPointTime(data: DataFormProps, holiday: boolean) {
     const idUser = user?.id!;
     const dateIsoString = dateSelected.toISOString();
 
@@ -134,6 +134,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
     const dataPoint = {
       ...data,
+      holiday,
       dateTime: monthSelected,
       created_at: dateIsoString,
     };
