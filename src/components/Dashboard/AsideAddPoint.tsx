@@ -134,7 +134,7 @@ export function AsideAddPoint() {
   const isHoliday = watch("holiday");
 
   return (
-    <div className="bg-zinc-800 h-full w-full sm:w-[380px] flex flex-col items-center pt-4 rounded">
+    <div className="flex flex-col h-full justify-center items-center">
       <ClockTimeStatus
         bonusTotalMinutesStatus={bonusTotalMinutesStatus}
         hours={hours}
@@ -178,7 +178,7 @@ export function AsideAddPoint() {
       />
       <form
         onSubmit={handleSubmit(handleSubmitData)}
-        className="flex flex-col gap-6 w-[290px]"
+        className="flex flex-col gap-2 w-[290px]"
       >
         <div className="flex justify-between items-center">
           <div>

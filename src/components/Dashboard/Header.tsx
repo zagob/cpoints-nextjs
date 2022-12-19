@@ -29,10 +29,10 @@ export function Header() {
   const { onSignOut, user } = useAuth();
 
   return (
-    <header className="h-[60px] flex items-center justify-between px-10 bg-zinc-700">
+    <header className="h-[60px] flex items-center justify-between px-2 sm:px-10 bg-zinc-700">
       <div className="flex items-center justify-between">
         <h1>logo</h1>
-        <div className="ml-10 md:ml-32 mr-4 flex items-center gap-2">
+        <div className="hidden ml-10 md:ml-32 mr-4 sm:flex items-center gap-2">
           <Time
             isDisabled={!user?.infoUser}
             title="Entrada 1"
@@ -60,7 +60,9 @@ export function Header() {
             value={user?.infoUser?.totalHours}
           />
         </div>
-        <ModalInfoUser />
+        <div className="hidden sm:block">
+          <ModalInfoUser />
+        </div>
       </div>
 
       <div className="flex items-center gap-6">

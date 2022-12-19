@@ -114,8 +114,53 @@ export function Table() {
     return <EmptyDataTable />;
   }
 
+  // <THead
+  //           title="Data"
+  //           classNameString={`${!isQuery2XL ? "w-[180px]" : "w-[295px]"} `}
+  //         />
+  //         <THead title="Entrada" classNameString="hidden lg:table-cell" />
+  //         <THead
+  //           title="Almoço"
+  //           classNameString={`${
+  //             isQueryXL ? "w-[250px]" : "w-[150px]"
+  //           } hidden lg:table-cell`}
+  //         />
+  //         <THead title="Saída" classNameString="hidden md:table-cell" />
+  //         <THead title="Total Horas" classNameString="hidden sm:table-cell" />
+  //         <THead title="Bonús" />
+  //         <THead title="Ações" />
+
   return (
-    <table className="border-collapse rounded-lg w-full">
+    <table className="table-auto w-full border-collapse rounded-lg text-left text-sm">
+      <thead className="bg-slate-700 text-slate-400">
+        <tr>
+          <THead
+            title="Data"
+            classNameString={`${!isQuery2XL ? "w-[180px]" : "w-[295px]"} `}
+          />
+          <THead title="Entrada" classNameString="hidden lg:table-cell" />
+          <THead
+            title="Almoço"
+            classNameString={`${
+              isQueryXL ? "w-[250px]" : "w-[150px]"
+            } hidden lg:table-cell`}
+          />
+          <THead title="Saída" classNameString="hidden md:table-cell" />
+          <THead title="Total Horas" classNameString="hidden sm:table-cell" />
+          <THead title="Bonús" />
+          <THead title="Ações" />
+        </tr>
+      </thead>
+      <tbody>
+      {points.map((point) => {
+          return <TRow key={point.id} point={point} />;
+        })}
+      </tbody>
+    </table>
+  );
+
+  return (
+    <table className="table-auto border-collapse rounded-lg w-full">
       <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
         <tr>
           <THead
