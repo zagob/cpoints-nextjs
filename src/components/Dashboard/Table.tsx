@@ -1,10 +1,10 @@
 import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt";
+import { ClipboardText } from "phosphor-react";
 import { useTime } from "../../hooks/useTime";
 import { useIs2XL, useIsXL } from "../../utils/mediaQueryHook";
 import { EmptyDataTable } from "../EmptyDataTable";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
-import { ModalInfoPoint } from "../modals/ModalInfoPoint";
 
 interface THeadProps {
   title: string;
@@ -37,6 +37,7 @@ function THead({ title, classNameString }: THeadProps) {
 }
 
 function TRow({ point }: TRowPointProps) {
+  const { onSetPointSelected, pointSelected } = useTime();
   const isQuery2XL = useIs2XL();
   const isQueryXL = useIsXL();
   const {
@@ -66,7 +67,9 @@ function TRow({ point }: TRowPointProps) {
     <tr
       className={`bg-slate-800 border-b border-b-slate-700 font-light ${
         !holiday && "hover:brightness-150 cursor-default"
-      } ${holiday && "opacity-70 bg-slate-900"}`}
+      } ${holiday && "opacity-70 bg-slate-900"} ${
+        pointSelected?.id === id && "brightness-150"
+      }`}
     >
       <td className="py-1 px-6">{isQuery2XL ? dateLg : dateMd}</td>
       <td className="py-1 px-6 hidden lg:table-cell">{entryOne}</td>
@@ -92,7 +95,11 @@ function TRow({ point }: TRowPointProps) {
       <td className="py-1 px-6">
         <div className="flex items-center gap-1">
           <ModalDeletePoint idPoint={id} />
-          <ModalInfoPoint point={point} />
+          {/* <ClipboardText
+            onClick={() => onSetPointSelected(point)}
+            size={20}
+            className="text-gray-300 transition-all hover:text-gray-100 hover:cursor-pointer"
+          /> */}
         </div>
       </td>
     </tr>

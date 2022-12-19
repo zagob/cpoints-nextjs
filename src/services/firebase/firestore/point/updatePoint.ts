@@ -24,17 +24,17 @@ type UpdatePointProps = z.infer<typeof DataPointSchema>;
 export async function updatePoint(
   idUser: string,
   idPoint: string,
-  dataPoint: UpdatePointProps
+  dataPoint: UpdatePointProps,
+  totalHours: string
 ) {
-  const { entryOne, entryTwo, exitOne, exitTwo } = dataPoint;
+  const { entryOne, entryTwo, exitOne, exitTwo, created_at, dateTime } =
+    dataPoint;
 
   const user = await existUserIdById(idUser);
 
   if (!user.success) {
     return user.message;
   }
-
-  const totalHours = user.data?.infoUser?.totalHours;
 
   if (
     entryOne.length === 0 ||
@@ -59,8 +59,7 @@ export async function updatePoint(
     };
   }
 
-  const totalHoursInMinutes = timeStringToMinute(totalHours!);
-
+  const totalHoursInMinutes = timeStringToMinute(totalHours);
   const entryOneSplit = splitStringTime(entryOne);
   const exitOneSplit = splitStringTime(exitOne);
   const entryTwoSplit = splitStringTime(entryTwo);
@@ -104,6 +103,8 @@ export async function updatePoint(
     entryTwo,
     exitOne,
     exitTwo,
+    created_at,
+    dateTime,
     bankBalance,
   });
 
@@ -112,6 +113,8 @@ export async function updatePoint(
     entryTwo,
     exitOne,
     exitTwo,
+    created_at,
+    dateTime,
     bankBalance,
   };
 

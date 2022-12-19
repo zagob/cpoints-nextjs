@@ -10,7 +10,7 @@ import { useTime } from "../../hooks/useTime";
 import { Button } from "../Button";
 import { z } from "zod";
 import { ArrowRight, Check } from "phosphor-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const DataFormSchema = z.object({
   entryOne: z.string(),
@@ -87,18 +87,32 @@ export function AsideAddPoint() {
     points,
     bonusTotalMinutes,
     onAddPointTime,
+    pointSelected,
+    onSetPointSelected,
+    onUpdatePointTime,
   } = useTime();
-  const { handleSubmit, register, reset, watch } = useForm<DataFormProps>({
-    defaultValues: {
-      entryOne: "",
-      entryTwo: "",
-      exitOne: "",
-      exitTwo: "",
-    },
-  });
+  const { handleSubmit, register, setValue, reset, watch } =
+    useForm<DataFormProps>({
+      defaultValues: {
+        entryOne: "",
+        entryTwo: "",
+        exitOne: "",
+        exitTwo: "",
+      },
+    });
 
   async function handleSubmitData(data: DataFormProps) {
     setLoading(true);
+
+    if (pointSelected) {
+      const dataTime = {
+        ...data,
+        entryOne: pointSelected.entryOne,
+      };
+      await onUpdatePointTime(pointSelected.id, data, holiday);
+      setLoading(false);
+      return;
+    }
     if (holiday) {
       const dataTimeFormat = {
         entryOne: "00:00",
@@ -134,13 +148,39 @@ export function AsideAddPoint() {
 
   const isHoliday = holiday;
 
+  useEffect(() => {
+    if (pointSelected) {
+      setValue(
+        "entryOne",
+        pointSelected.entryOne === "00:00" ? "" : pointSelected.entryOne
+      );
+      setValue(
+        "entryTwo",
+        pointSelected.entryTwo === "00:00" ? "" : pointSelected.entryTwo
+      );
+      setValue(
+        "exitOne",
+        pointSelected.exitOne === "00:00" ? "" : pointSelected.exitOne
+      );
+      setValue(
+        "exitTwo",
+        pointSelected.exitTwo === "00:00" ? "" : pointSelected.exitTwo
+      );
+      setHoliday(pointSelected.holiday);
+    }
+
+    return () => {};
+  }, [pointSelected]);
+
   return (
     <div className="flex flex-col h-full justify-center items-center">
-      <ClockTimeStatus
-        bonusTotalMinutesStatus={bonusTotalMinutesStatus}
-        hours={hours}
-        minutes={minutes}
-      />
+      {!pointSelected && (
+        <ClockTimeStatus
+          bonusTotalMinutesStatus={bonusTotalMinutesStatus}
+          hours={hours}
+          minutes={minutes}
+        />
+      )}
       <DayPicker
         locale={ptBr}
         mode="single"
@@ -163,7 +203,10 @@ export function AsideAddPoint() {
             opacity: 0.4,
           },
         }}
-        onMonthChange={(date) => onSetMonthSelected(date)}
+        onMonthChange={(date) => {
+          onSetPointSelected(null);
+          onSetMonthSelected(date);
+        }}
         toYear={new Date().getFullYear()}
         fromYear={2020}
         footer={`Data Selecionada: ${format(
@@ -271,7 +314,11 @@ export function AsideAddPoint() {
             classNameStyle="w-full"
             statusColor="green"
           >
-            {loading ? "Enviando..." : "Enviar"}
+            {loading
+              ? "Enviando..."
+              : pointSelected
+              ? "Editar ponto"
+              : "Cadastrar novo ponto"}
           </Button>
         </div>
       </form>
