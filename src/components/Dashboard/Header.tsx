@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Power, UserCircle } from "phosphor-react";
+import { ClockAfternoon, Power, UserCircle } from "phosphor-react";
 import { useAuth } from "../../hooks/useAuth";
 import { ModalInfoUser } from "../modals/ModalInfoUser";
 
@@ -31,7 +31,7 @@ export function Header() {
   return (
     <header className="h-[60px] flex items-center justify-between px-2 sm:px-10 bg-zinc-700">
       <div className="flex items-center justify-between">
-        <h1>logo</h1>
+        <ClockAfternoon size={32} />
         <div className="hidden ml-10 md:ml-32 mr-4 sm:flex items-center gap-2">
           <Time
             isDisabled={!user?.infoUser}

@@ -1,16 +1,17 @@
-import { InputMask } from "../../components/InputMask";
+import { useEffect, useState } from "react";
+import { DayPicker } from "react-day-picker";
+import { ArrowRight, Check } from "phosphor-react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import { useForm } from "react-hook-form";
-import { useAuth } from "../../hooks/useAuth";
-
-import { DayPicker } from "react-day-picker";
 import { format } from "date-fns";
 import ptBr from "date-fns/locale/pt";
-import { useTime } from "../../hooks/useTime";
-import { Button } from "../Button";
 import { z } from "zod";
-import { ArrowRight, Check } from "phosphor-react";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
+import { InputMask } from "../../components/InputMask";
+import { Button } from "../Button";
+import { useAuth } from "../../hooks/useAuth";
+import { useTime } from "../../hooks/useTime";
 
 const DataFormSchema = z.object({
   entryOne: z.string(),
@@ -48,8 +49,16 @@ function ClockTimeStatus({
     <div
       className={`border-2 w-[80px] h-[38px] flex items-center justify-center gap-1 bg-zinc-900 rounded-md relative ${stylesClassText}`}
     >
-      <div
-        className={`absolute w-6 h-1 rounded-t-md -top-[6px] right-2 ${stylesClassBackground}`}
+      <motion.div
+        animate={{ top: ["-6px", "-3px", "-6px"], height: [4, 2, 4] }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "easeInOut",
+          repeatDelay: 5,
+          times: [0, 0.2, 0.5, 0.8, 1],
+        }}
+        className={`absolute w-6 h-1 rounded-t-md right-2 ${stylesClassBackground}`}
       />
       <div
         className={`absolute w-2 h-[2px] left-3 top-1 rounded-l-sm rounded-r-sm ${stylesClassBackground}`}
@@ -135,7 +144,7 @@ export function AsideAddPoint() {
     .toString()
     .padStart(2, "0");
   const minutes = (bonusTotalMinutes % 60).toString().padStart(2, "0");
-  
+
   const { entryOne, entryTwo, exitOne, exitTwo } = dirtyFields;
   const isValueHasString = entryOne && entryTwo && exitOne && exitTwo;
 

@@ -20,7 +20,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col relative overflow-hidden">
+    <div className="h-screen flex flex-col relative overflow-x-hidden">
       <Header />
       <motion.div
         animate={dropdown ? { right: 0 } : { right: "-100%" }}
@@ -29,7 +29,7 @@ export default function Dashboard() {
       >
         <div
           onClick={() => setDropdown((old) => !old)}
-          className="w-[50px] -left-12 absolute bg-zinc-700 rounded-l-lg shadow-lg"
+          className="w-[50px] -left-12 absolute top-4 bg-zinc-700 rounded-l-lg shadow-lg"
         >
           <List size={32} className="pl-1" />
         </div>
@@ -44,8 +44,8 @@ export default function Dashboard() {
             onClick={() => setDropdown(false)}
           />
         </motion.div>
-        <div className="absolute flex flex-col w-full bottom-0 h-[95%]">
-          <div className="w-full flex-1 overflow-auto">
+        <div className="absolute flex flex-col w-full top-12 pb-4">
+          <div className="w-full flex-1 overflow-y-auto">
             <Table />
           </div>
           <div className="w-full h-[250px]">
