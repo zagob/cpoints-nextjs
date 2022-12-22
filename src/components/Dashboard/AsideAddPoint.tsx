@@ -91,42 +91,38 @@ export function AsideAddPoint() {
     onSetPointSelected,
     onUpdatePointTime,
   } = useTime();
-  const { handleSubmit, register, setValue, reset, watch } =
-    useForm<DataFormProps>({
-      defaultValues: {
-        entryOne: "",
-        entryTwo: "",
-        exitOne: "",
-        exitTwo: "",
-      },
-    });
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    reset,
+    watch,
+    formState: { dirtyFields },
+  } = useForm<DataFormProps>({
+    defaultValues: {
+      entryOne: "",
+      entryTwo: "",
+      exitOne: "",
+      exitTwo: "",
+    },
+  });
 
   async function handleSubmitData(data: DataFormProps) {
     setLoading(true);
+    let dataTimeFormat = {
+      ...data,
+    };
 
-    if (pointSelected) {
-      const dataTime = {
-        ...data,
-        entryOne: pointSelected.entryOne,
-      };
-      await onUpdatePointTime(pointSelected.id, data, holiday);
-      setLoading(false);
-      return;
-    }
     if (holiday) {
-      const dataTimeFormat = {
+      dataTimeFormat = {
         entryOne: "00:00",
         exitOne: "00:00",
         entryTwo: "00:00",
         exitTwo: "00:00",
       };
-      await onAddPointTime(dataTimeFormat, holiday);
-      setLoading(false);
-      reset();
-      return;
     }
 
-    await onAddPointTime(data, holiday);
+    await onAddPointTime(dataTimeFormat, holiday);
     setLoading(false);
     reset();
   }
@@ -139,12 +135,9 @@ export function AsideAddPoint() {
     .toString()
     .padStart(2, "0");
   const minutes = (bonusTotalMinutes % 60).toString().padStart(2, "0");
-
-  const isValueHasString =
-    watch("entryOne").length === 5 &&
-    watch("entryTwo").length === 5 &&
-    watch("exitOne").length === 5 &&
-    watch("exitTwo").length === 5;
+  
+  const { entryOne, entryTwo, exitOne, exitTwo } = dirtyFields;
+  const isValueHasString = entryOne && entryTwo && exitOne && exitTwo;
 
   const isHoliday = holiday;
 
@@ -305,12 +298,7 @@ export function AsideAddPoint() {
         <div className="flex justify-center w-full">
           <Button
             type="submit"
-            disabled={
-              !user?.infoUser ||
-              (isValueHasString && isHoliday) ||
-              (!isHoliday && !isValueHasString) ||
-              loading
-            }
+            disabled={!user?.infoUser || loading || !isValueHasString}
             classNameStyle="w-full"
             statusColor="green"
           >
