@@ -307,7 +307,7 @@ export function AsideAddPoint() {
         <div className="flex justify-center w-full">
           <Button
             type="submit"
-            disabled={!user?.infoUser || loading || !isValueHasString}
+            disabled={loading}
             classNameStyle="w-full"
             statusColor="green"
           >
