@@ -9,6 +9,21 @@ const ChartAp = dynamic(() => import("react-apexcharts"), {
 export function Chart() {
   const { allMinutesMonthChart } = useTime();
 
+  const months = [
+    "2022-01-01T00:00:00.000Z",
+    "2022-02-01T00:00:00.000Z",
+    "2022-03-01T00:00:00.000Z",
+    "2022-04-01T00:00:00.000Z",
+    "2022-05-01T00:00:00.000Z",
+    "2022-06-01T00:00:00.000Z",
+    "2022-07-01T00:00:00.000Z",
+    "2022-08-01T00:00:00.000Z",
+    "2022-09-01T00:00:00.000Z",
+    "2022-10-01T00:00:00.000Z",
+    "2022-11-01T00:00:00.000Z",
+    "2022-12-30T00:00:00.000Z",
+  ];
+
   const options: ApexOptions = {
     chart: {
       toolbar: {
@@ -18,6 +33,7 @@ export function Chart() {
         enabled: false,
       },
       foreColor: "#fff",
+      stacked: true,
     },
     grid: {
       show: false,
@@ -44,20 +60,7 @@ export function Chart() {
         color: "#ccc",
       },
 
-      categories: [
-        "2022-01-01T00:00:00.000Z",
-        "2022-02-01T00:00:00.000Z",
-        "2022-03-01T00:00:00.000Z",
-        "2022-04-01T00:00:00.000Z",
-        "2022-05-01T00:00:00.000Z",
-        "2022-06-01T00:00:00.000Z",
-        "2022-07-01T00:00:00.000Z",
-        "2022-08-01T00:00:00.000Z",
-        "2022-09-01T00:00:00.000Z",
-        "2022-10-01T00:00:00.000Z",
-        "2022-11-01T00:00:00.000Z",
-        "2022-12-30T00:00:00.000Z",
-      ],
+      categories: months,
     },
     fill: {
       opacity: 0.3,
@@ -67,6 +70,9 @@ export function Chart() {
         opacityFrom: 0.7,
         opacityTo: 0.3,
       },
+    },
+    stroke: {
+      curve: "smooth",
     },
   };
 

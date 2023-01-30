@@ -59,5 +59,7 @@ export async function getByDate(idUser: string, month: string, year: string) {
       return acc;
     }, 0);
 
+  console.log("points", dataOrderBy);
+
   return { bonusTotalMinutes, points: dataOrderBy };
 }

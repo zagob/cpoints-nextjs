@@ -2,10 +2,10 @@ import { z } from "zod";
 import { updateDoc, doc, db } from "../index";
 
 const InfoUserSchema = z.object({
-  entryOne: z.string(),
-  entryTwo: z.string(),
-  exitOne: z.string(),
-  exitTwo: z.string(),
+  entryOne: z.number().max(480, { message: "Formato de time inválido" }),
+  entryTwo: z.number().max(480, { message: "Formato de time inválido" }),
+  exitOne: z.number().max(480, { message: "Formato de time inválido" }),
+  exitTwo: z.number().max(480, { message: "Formato de time inválido" }),
   totalHours: z.string(),
 });
 
