@@ -52,13 +52,13 @@ export async function createPoint(
     exitOne,
     entryTwo,
     exitTwo,
-    dateTime: dayjs(dateTime).format("YYYY/MM"),
-    created_at: dayjs(created_at).toISOString(),
+    dateTime,
+    created_at,
     bankBalance,
     holiday,
   };
 
-  const newDataPointRef = doc(collection(db, `users/${idUser}/pTest`));
+  const newDataPointRef = doc(collection(db, `users/${idUser}/points`));
 
   await setDoc(newDataPointRef, {
     ...dataPoint,

@@ -98,14 +98,12 @@ export function AsideAddPoint() {
     onAddPointTime,
     pointSelected,
     onSetPointSelected,
-    onUpdatePointTime,
   } = useTime();
   const {
     handleSubmit,
     register,
     setValue,
     reset,
-    watch,
     formState: { dirtyFields },
   } = useForm<DataFormProps>({
     defaultValues: {

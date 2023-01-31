@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import dayjs from "dayjs";
 import { createContext, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
 import { useQuery } from "react-query";
@@ -8,18 +9,13 @@ import { createPoint } from "../services/firebase/firestore/point/createPoint";
 import { deletePoint } from "../services/firebase/firestore/point/deletePoint";
 import { getAllMonthTotalMinutes } from "../services/firebase/firestore/point/getAllMonthTotalMinutes";
 import { getByDate } from "../services/firebase/firestore/point/getByDate";
-import { updatePoint } from "../services/firebase/firestore/point/updatePoint";
 import { existUserIdById } from "../services/firebase/firestore/user/existUserById";
+import { timeStringToMinute } from "../utils/timeStringToMinutes";
 
 interface TimeContextProps {
   onSetDateSelected: (date: Date) => void;
   onSetMonthSelected: (date: Date) => void;
   onAddPointTime: (data: DataFormProps, holiday: boolean) => Promise<void>;
-  onUpdatePointTime: (
-    idPoint: string,
-    data: DataFormProps,
-    holiday: boolean
-  ) => Promise<void>;
   onDeletePoint: (id: string) => Promise<void>;
   onSetPointSelected: (point: PointsProps | null) => void;
   pointSelected: PointsProps | null;
@@ -96,13 +92,11 @@ export function TimeProvider({ children }: TimeProviderProps) {
   const { refetch: refetchAllMonth } = useQuery({
     queryKey: ["getAllMonth", year],
     queryFn: async () => {
-      console.log("carregando");
       const result = await getAllMonthTotalMinutes(user?.id!, year);
 
       return result;
     },
     onSuccess: (data: number[]) => {
-      console.log("carregou");
       setAllMinutesMonthChart(data);
     },
     enabled: !!user,
@@ -119,15 +113,16 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
   async function onAddPointTime(data: DataFormProps, holiday: boolean) {
     const idUser = user?.id!;
-    const dateIsoString = dateSelected.toISOString();
 
-    const [getYearMonthDate] = dateIsoString.split("T");
+    const formatDateSelected = dayjs(dateSelected).format("YYYY-MM-DD");
+    const dateSelectedISO = dayjs(dateSelected).toISOString();
 
-    const verifySomeDate = points
-      .map((point) => new Date(point.created_at).toISOString().split("T")[0])
-      .some((point) => point === getYearMonthDate);
+    const existSameDate = points.some(
+      (point) =>
+        dayjs(point.created_at).format("YYYY-MM-DD") === formatDateSelected
+    );
 
-    if (verifySomeDate) {
+    if (existSameDate) {
       toast.error("Já existe uma data cadastrada");
       return;
     }
@@ -141,63 +136,33 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
     const totalHours = result.data?.infoUser?.totalHours;
 
-    const dataPoint = {
-      ...data,
-      holiday,
-      dateTime: monthSelected,
-      created_at: dateIsoString,
+    const entryOneToMinutes = timeStringToMinute(data.entryOne);
+    const exitOneToMinutes = timeStringToMinute(data.exitOne);
+    const entryTwoToMinutes = timeStringToMinute(data.entryTwo);
+    const exitTwoToMinutes = timeStringToMinute(data.exitTwo);
+
+    const totalHoursToMinutes = timeStringToMinute(totalHours);
+
+    const timePointToMinutes = {
+      entryOne: entryOneToMinutes,
+      exitOne: exitOneToMinutes,
+      entryTwo: entryTwoToMinutes,
+      exitTwo: exitTwoToMinutes,
     };
 
-    await createPoint(idUser, dataPoint, totalHours);
+    const dataPoint = {
+      ...timePointToMinutes,
+      holiday,
+      dateTime: monthSelected,
+      created_at: dateSelectedISO,
+    };
+
+    await createPoint(idUser, dataPoint, totalHoursToMinutes);
 
     refetch();
     refetchAllMonth();
 
     toast.success("Ponto cadastrada com sucesso!");
-  }
-
-  async function onUpdatePointTime(
-    idPoint: string,
-    data: DataFormProps,
-    holiday: boolean
-  ) {
-    const idUser = user?.id!;
-    const dateIsoString = dateSelected.toISOString();
-
-    const [getYearMonthDate] = dateIsoString.split("T");
-
-    const verifySomeDate = points
-      .map((point) => new Date(point.created_at).toISOString().split("T")[0])
-      .filter((point) => !(point === getYearMonthDate))
-      .some((point) => point === getYearMonthDate);
-
-    if (verifySomeDate) {
-      toast.error("Já existe uma data cadastrada");
-      return;
-    }
-
-    const result = await existUserIdById(idUser);
-
-    if (!result.data?.infoUser) {
-      toast.error("Usuario não encontrado");
-      return;
-    }
-
-    const totalHours = result.data?.infoUser?.totalHours;
-
-    const dataPoint = {
-      ...data,
-      holiday,
-      dateTime: monthSelected,
-      created_at: dateIsoString,
-    };
-
-    await updatePoint(idUser, idPoint, dataPoint, totalHours);
-
-    refetch();
-    refetchAllMonth();
-
-    toast.success("Ponto Editado com sucesso!");
   }
 
   function onSetPointSelected(point: PointsProps | null) {
@@ -242,7 +207,6 @@ export function TimeProvider({ children }: TimeProviderProps) {
         points,
         isLoadingPoints,
         onAddPointTime,
-        onUpdatePointTime,
         onDeletePoint,
         allMinutesMonthChart,
       }}
