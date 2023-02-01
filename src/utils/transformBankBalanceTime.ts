@@ -13,7 +13,7 @@ export function BankBalanceTime(
   const timeLunch = entryTwo - exitOne;
   const timeAffternoon = exitTwo - entryTwo;
 
-  const totalTime = timeAffternoon - timeMorning;
+  const totalTime = timeMorning + timeAffternoon;
   const bonus = totalTime - totalHours;
 
   const isNumberStatus = Math.sign(bonus);

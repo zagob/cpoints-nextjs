@@ -7,22 +7,13 @@ const ChartAp = dynamic(() => import("react-apexcharts"), {
 });
 
 export function Chart() {
-  const { allMinutesMonthChart } = useTime();
+  const { dataAllMonthOfYear } = useTime();
 
-  const months = [
-    "2022-01-01T00:00:00.000Z",
-    "2022-02-01T00:00:00.000Z",
-    "2022-03-01T00:00:00.000Z",
-    "2022-04-01T00:00:00.000Z",
-    "2022-05-01T00:00:00.000Z",
-    "2022-06-01T00:00:00.000Z",
-    "2022-07-01T00:00:00.000Z",
-    "2022-08-01T00:00:00.000Z",
-    "2022-09-01T00:00:00.000Z",
-    "2022-10-01T00:00:00.000Z",
-    "2022-11-01T00:00:00.000Z",
-    "2022-12-30T00:00:00.000Z",
-  ];
+  const months = Array.from({ length: 12 }).map((_, index) => {
+    const y = new Date().getFullYear();
+    const month = index + 1;
+    return new Date(y, month, 0).toISOString();
+  });
 
   const options: ApexOptions = {
     chart: {
@@ -79,7 +70,7 @@ export function Chart() {
   const series = [
     {
       name: "series1",
-      data: allMinutesMonthChart as [],
+      data: dataAllMonthOfYear as [],
     },
   ];
   return (

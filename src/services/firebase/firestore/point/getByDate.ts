@@ -1,65 +1,66 @@
-import { query, collection, where, db, getDocs, orderBy } from "../index";
+import { query, collection, where, db, getDocs } from "../index";
+
+interface PointProps {
+  id: string;
+  created_at: Date;
+  dateTime: string;
+  entryOne: number;
+  exitOne: number;
+  entryTwo: number;
+  exitTwo: number;
+  holiday: boolean;
+  bankBalance: {
+    bonus: number;
+    status: "UP" | "DOWN" | "EQUAL";
+    timeAffternoon: number;
+    timeLunch: number;
+    timeMorning: number;
+    totalTime: number;
+  };
+}
+
+export interface DataByMonthProps {
+  totalMinutesByMonth: number;
+  points: PointProps[];
+}
 
 export async function getByDate(idUser: string, month: string, year: string) {
-  const q = query(
-    collection(db, `users/${idUser}/points`),
+  const queryOfMonthAndYear = query(
+    collection(db, `users/${idUser}/pTest`),
     where("dateTime", "==", `${year}/${month}`)
   );
 
-  const queryOrderBy = query(
-    collection(db, `users/${idUser}/points`),
-    orderBy("created_at", "asc")
-  );
+  const getDataSnapShot = await getDocs(queryOfMonthAndYear);
+  const getDataMonthAndYear = getDataSnapShot.docs.map((point) => {
+    const data = point.data() as PointProps;
 
-  const querySnapshotOrderBy = await getDocs(queryOrderBy);
+    return data;
+  });
 
-  const dataOrderBy = querySnapshotOrderBy.docs
-    .map((item) => {
-      const dataOrderBy = item.data();
+  const sortData = getDataMonthAndYear.sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime();
+    const dateB = new Date(b.created_at).getTime();
+    return dateA - dateB;
+  });
 
-      return dataOrderBy;
-    })
-    .filter((item) => item.dateTime === `${year}/${month}`);
+  const totalMinutesByMonth = getDataMonthAndYear.reduce((acc, value) => {
+    const bonus = value.bankBalance.bonus;
 
-  const querySnapshot = await getDocs(q);
-
-  const data = querySnapshot.docs;
-
-  const filterRemoveHoliday = data
-    .map((item) => {
-      const data = item.data();
-
-      return data;
-    })
-    .filter((item) => item.holiday !== true);
-
-  const bonusTotalMinutes = filterRemoveHoliday
-    .map((item) => {
-      const { bankBalance } = item;
-
-      const [hour, minute] = bankBalance.bonusTimePoint
-        .split(":")
-        .map((item: string) => Number(item));
-
-      const totalMinutes = hour * 60 + minute;
-
-      return {
-        ...bankBalance,
-        totalTimePointMinuts: totalMinutes,
-      };
-    })
-    .reduce((acc, value) => {
-      if (value.statusPoint === "UP") {
-        acc += value.totalTimePointMinuts;
-      }
-      if (value.statusPoint === "DOWN") {
-        acc -= value.totalTimePointMinuts;
-      }
-
+    if (value.holiday) {
       return acc;
-    }, 0);
+    }
 
-  console.log("points", dataOrderBy);
+    if (value.bankBalance.status === "UP") {
+      acc += bonus;
+    }
+    if (value.bankBalance.status === "DOWN") {
+      acc -= bonus;
+    }
 
-  return { bonusTotalMinutes, points: dataOrderBy };
+    return acc;
+  }, 0);
+
+  console.log("sortData", sortData);
+
+  return { totalMinutesByMonth, points: sortData };
 }

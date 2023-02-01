@@ -12,6 +12,7 @@ import { InputMask } from "../../components/InputMask";
 import { Button } from "../Button";
 import { useAuth } from "../../hooks/useAuth";
 import { useTime } from "../../hooks/useTime";
+import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 
 const DataFormSchema = z.object({
   entryOne: z.string(),
@@ -93,11 +94,10 @@ export function AsideAddPoint() {
     dateSelected,
     onSetDateSelected,
     onSetMonthSelected,
-    points,
-    bonusTotalMinutes,
+    onSetPointSelected,
     onAddPointTime,
     pointSelected,
-    onSetPointSelected,
+    dataByMonth,
   } = useTime();
   const {
     handleSubmit,
@@ -134,14 +134,15 @@ export function AsideAddPoint() {
     reset();
   }
 
-  const disabledDays = points.map((point) => new Date(point.created_at));
+  const disabledDays = dataByMonth?.points.map(
+    (point) => new Date(point.created_at)
+  );
 
-  const bonusTotalMinutesStatus = Math.sign(bonusTotalMinutes);
+  const bonusTotalMinutesStatus = Math.sign(dataByMonth?.totalMinutesByMonth!);
 
-  const hours = Math.floor(bonusTotalMinutes / 60)
-    .toString()
-    .padStart(2, "0");
-  const minutes = (bonusTotalMinutes % 60).toString().padStart(2, "0");
+  const [hours, minutes] = TimeMinutesToString(
+    Number(dataByMonth?.totalMinutesByMonth)
+  ).split(":");
 
   const { entryOne, entryTwo, exitOne, exitTwo } = dirtyFields;
   const isValueHasString = entryOne && entryTwo && exitOne && exitTwo;
@@ -191,7 +192,7 @@ export function AsideAddPoint() {
           }
           onSetDateSelected(date);
         }}
-        disabled={[{ dayOfWeek: [0, 6] }, ...disabledDays]}
+        disabled={[{ dayOfWeek: [0, 6] }, ...(disabledDays ?? [])]}
         modifiers={{
           available: { dayOfWeek: [1, 2, 3, 4, 5] },
         }}

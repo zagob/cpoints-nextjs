@@ -12,9 +12,10 @@ import { useTime } from "../hooks/useTime";
 import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../services/firebase/firestore";
 import dayjs from "dayjs";
-import { timeStringToMinute } from "../utils/timeStringToMinutes";
+
 import { BankBalanceTime } from "../utils/transformBankBalanceTime";
 import { createPoint } from "../services/firebase/firestore/point/createPoint";
+import { timeStringToMinutes } from "../utils/timeStringToMinutes";
 
 export default function Dashboard() {
   const [dropdown, setDropdown] = useState(false);
@@ -25,62 +26,50 @@ export default function Dashboard() {
     return <Loading />;
   }
 
-  // async function addPoint() {
-
-  //   points.map(async (point) => {
-  //     await createPoint(
-  //       user?.id!,
-  //       {
-  //         entryOne: point.entryOne,
-  //         exitOne: point.exitOne,
-  //         entryTwo: point.entryTwo,
-  //         exitTwo: point.exitTwo,
-  //         holiday: point.holiday ?? false,
-  //         created_at: point.created_at,
-  //         dateTime: point.dateTime,
-  //       },
-  //       480
-  //     );
-  //   });
-  // }
-
-  async function getAll() {
+  async function addPoint() {
     const p = collection(db, `users/${user?.id!}/points`);
     const docSnap = await getDocs(p);
 
-    console.log(
-      docSnap.docs.map((doc) => {
-        const d = doc.data();
+    const data = docSnap.docs.map((item) => item.data());
 
-        const entryOneToMinutes = timeStringToMinute(d.entryOne);
-        const exitOneToMinutes = timeStringToMinute(d.exitOne);
-        const entryTwoToMinutes = timeStringToMinute(d.entryTwo);
-        const exitTwoToMinutes = timeStringToMinute(d.exitTwo);
+    console.log(data);
 
-        const bankBalance = BankBalanceTime(480, {
-          entryOne: entryOneToMinutes,
-          exitOne: exitOneToMinutes,
-          entryTwo: entryTwoToMinutes,
-          exitTwo: exitTwoToMinutes,
-        });
+    data.map(async (point) => {
+      await createPoint(
+        String(user?.id),
+        {
+          entryOne: timeStringToMinutes(point.entryOne),
+          exitOne: timeStringToMinutes(point.exitOne),
+          entryTwo: timeStringToMinutes(point.entryTwo),
+          exitTwo: timeStringToMinutes(point.exitTwo),
+          holiday: point.holiday ?? false,
+          created_at: point.created_at,
+          dateTime: point.dateTime,
+        },
+        480
+      );
+    });
 
-        return {
-          entryOne: entryOneToMinutes,
-          exitOne: exitOneToMinutes,
-          entryTwo: entryTwoToMinutes,
-          exitTwo: exitTwoToMinutes,
-          bankBalance,
-          dateTime: d.dateTime,
-          created_at: d.created_at,
-          holiday: d.holiday,
-        };
-      })
-    );
+    // points.map(async (point) => {
+    //   await createPoint(
+    //     user?.id!,
+    //     {
+    //       entryOne: point.entryOne,
+    //       exitOne: point.exitOne,
+    //       entryTwo: point.entryTwo,
+    //       exitTwo: point.exitTwo,
+    //       holiday: point.holiday ?? false,
+    //       created_at: point.created_at,
+    //       dateTime: point.dateTime,
+    //     },
+    //     480
+    //   );
+    // });
   }
 
   // return (
   //   <div className="flex flex-col gap-10">
-  //     <button onClick={getAll}>get all points</button>
+  //     <button onClick={addPoint}>get all points</button>
   //   </div>
   // );
 

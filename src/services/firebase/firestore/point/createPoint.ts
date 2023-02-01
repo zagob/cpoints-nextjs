@@ -1,6 +1,5 @@
-import { doc, db, addDoc, collection, updateDoc, setDoc } from "../index";
+import { doc, db, collection, setDoc } from "../index";
 import { z } from "zod";
-import dayjs from "dayjs";
 import { BankBalanceTime } from "../../../../utils/transformBankBalanceTime";
 
 const DataPointSchema = z.object({
@@ -58,7 +57,7 @@ export async function createPoint(
     holiday,
   };
 
-  const newDataPointRef = doc(collection(db, `users/${idUser}/points`));
+  const newDataPointRef = doc(collection(db, `users/${idUser}/pTest`));
 
   await setDoc(newDataPointRef, {
     ...dataPoint,

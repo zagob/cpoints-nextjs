@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import dayjs from "dayjs";
 import { createContext, ReactNode, useState } from "react";
 import toast from "react-hot-toast";
@@ -7,10 +6,16 @@ import { DataFormProps } from "../components/Dashboard/AsideAddPoint";
 import { useAuth } from "../hooks/useAuth";
 import { createPoint } from "../services/firebase/firestore/point/createPoint";
 import { deletePoint } from "../services/firebase/firestore/point/deletePoint";
-import { getAllMonthTotalMinutes } from "../services/firebase/firestore/point/getAllMonthTotalMinutes";
-import { getByDate } from "../services/firebase/firestore/point/getByDate";
+import {
+  DataAllMonthOfYear,
+  getAllMonthTotalMinutes,
+} from "../services/firebase/firestore/point/getAllMonthTotalMinutes";
+import {
+  DataByMonthProps,
+  getByDate,
+} from "../services/firebase/firestore/point/getByDate";
 import { existUserIdById } from "../services/firebase/firestore/user/existUserById";
-import { timeStringToMinute } from "../utils/timeStringToMinutes";
+import { timeStringToMinutes } from "../utils/timeStringToMinutes";
 
 interface TimeContextProps {
   onSetDateSelected: (date: Date) => void;
@@ -21,10 +26,13 @@ interface TimeContextProps {
   pointSelected: PointsProps | null;
   dateSelected: Date;
   monthSelected: string;
-  points: PointsProps[];
-  bonusTotalMinutes: number;
   isLoadingPoints: boolean;
-  allMinutesMonthChart: number[];
+  isLoadingGetAllMontOfYear: boolean;
+  dataAllMonthOfYear:
+    | DataAllMonthOfYear[]
+    | { success: boolean; message: string }
+    | undefined;
+  dataByMonth: DataByMonthProps | undefined;
 }
 
 interface TimeProviderProps {
@@ -59,17 +67,15 @@ export function TimeProvider({ children }: TimeProviderProps) {
   const [pointSelected, setPointSelected] = useState<PointsProps | null>(null);
   const [dateSelected, setDateSelected] = useState<Date>(new Date());
   const [monthSelected, setMonthSelected] = useState(
-    format(new Date(), "yyyy/MM")
-  );
-  const [points, setPoints] = useState<PointsProps[]>([]);
-  const [bonusTotalMinutes, setBonusTotalMinutes] = useState(0);
-
-  const [allMinutesMonthChart, setAllMinutesMonthChart] = useState<number[]>(
-    []
+    dayjs(new Date()).format("YYYY/MM")
   );
 
   const [year, month] = monthSelected.split("/");
-  const { refetch, isLoading: isLoadingPoints } = useQuery({
+  const {
+    data: dataByMonth,
+    refetch,
+    isLoading: isLoadingPoints,
+  } = useQuery({
     queryKey: ["getPointByDate", user, monthSelected],
     queryFn: async () => {
       if (user === null) {
@@ -79,25 +85,22 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
       return result;
     },
-    onSuccess: (data: { bonusTotalMinutes: number; points: [] }) => {
-      if (data) {
-        setPoints(data.points);
-        setBonusTotalMinutes(data.bonusTotalMinutes);
-      }
-    },
     enabled: !!user,
     refetchOnWindowFocus: false,
   });
 
-  const { refetch: refetchAllMonth } = useQuery({
+  const {
+    data: dataAllMonthOfYear,
+    refetch: refetchAllMonth,
+    isFetching: isLoadingGetAllMontOfYear,
+  } = useQuery({
     queryKey: ["getAllMonth", year],
     queryFn: async () => {
       const result = await getAllMonthTotalMinutes(user?.id!, year);
 
+      console.log("result", result);
+
       return result;
-    },
-    onSuccess: (data: number[]) => {
-      setAllMinutesMonthChart(data);
     },
     enabled: !!user,
     refetchOnWindowFocus: false,
@@ -108,7 +111,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
   }
 
   function onSetMonthSelected(date: Date) {
-    setMonthSelected(format(new Date(date), "yyyy/MM"));
+    setMonthSelected(dayjs(date).format("YYYY/MM"));
   }
 
   async function onAddPointTime(data: DataFormProps, holiday: boolean) {
@@ -117,7 +120,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
     const formatDateSelected = dayjs(dateSelected).format("YYYY-MM-DD");
     const dateSelectedISO = dayjs(dateSelected).toISOString();
 
-    const existSameDate = points.some(
+    const existSameDate = dataByMonth?.points.some(
       (point) =>
         dayjs(point.created_at).format("YYYY-MM-DD") === formatDateSelected
     );
@@ -136,12 +139,12 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
     const totalHours = result.data?.infoUser?.totalHours;
 
-    const entryOneToMinutes = timeStringToMinute(data.entryOne);
-    const exitOneToMinutes = timeStringToMinute(data.exitOne);
-    const entryTwoToMinutes = timeStringToMinute(data.entryTwo);
-    const exitTwoToMinutes = timeStringToMinute(data.exitTwo);
+    const entryOneToMinutes = timeStringToMinutes(data.entryOne);
+    const exitOneToMinutes = timeStringToMinutes(data.exitOne);
+    const entryTwoToMinutes = timeStringToMinutes(data.entryTwo);
+    const exitTwoToMinutes = timeStringToMinutes(data.exitTwo);
 
-    const totalHoursToMinutes = timeStringToMinute(totalHours);
+    const totalHoursToMinutes = timeStringToMinutes(totalHours);
 
     const timePointToMinutes = {
       entryOne: entryOneToMinutes,
@@ -197,18 +200,18 @@ export function TimeProvider({ children }: TimeProviderProps) {
   return (
     <TimeContext.Provider
       value={{
-        dateSelected,
         onSetDateSelected,
         onSetPointSelected,
-        pointSelected,
-        monthSelected,
         onSetMonthSelected,
-        bonusTotalMinutes,
-        points,
-        isLoadingPoints,
         onAddPointTime,
         onDeletePoint,
-        allMinutesMonthChart,
+        dateSelected,
+        pointSelected,
+        monthSelected,
+        dataAllMonthOfYear,
+        dataByMonth,
+        isLoadingPoints,
+        isLoadingGetAllMontOfYear,
       }}
     >
       {children}

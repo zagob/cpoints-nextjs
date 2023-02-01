@@ -1,8 +1,7 @@
-import { format } from "date-fns";
-import ptBR from "date-fns/locale/pt";
-import { ClipboardText } from "phosphor-react";
+import dayjs from "dayjs";
 import { useTime } from "../../hooks/useTime";
 import { useIs2XL, useIsXL } from "../../utils/mediaQueryHook";
+import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 import { EmptyDataTable } from "../EmptyDataTable";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
 
@@ -14,20 +13,20 @@ interface THeadProps {
 export interface TRowPointProps {
   point: {
     id: string;
-    entryOne: string;
-    entryTwo: string;
-    exitOne: string;
-    exitTwo: string;
-    dateTime: string;
     created_at: Date;
+    dateTime: string;
+    entryOne: number;
+    exitOne: number;
+    entryTwo: number;
+    exitTwo: number;
     holiday: boolean;
     bankBalance: {
-      timeMorning: string;
-      lunch: string;
-      timeAfternoon: string;
-      bonusTimePoint: string;
-      totalTimePoint: string;
-      statusPoint: "DOWN" | "EQUAL" | "UP";
+      bonus: number;
+      status: "UP" | "DOWN" | "EQUAL";
+      timeAffternoon: number;
+      timeLunch: number;
+      timeMorning: number;
+      totalTime: number;
     };
   };
 }
@@ -37,11 +36,10 @@ function THead({ title, classNameString }: THeadProps) {
 }
 
 function TRow({ point }: TRowPointProps) {
-  const { onSetPointSelected, pointSelected } = useTime();
+  const { pointSelected } = useTime();
   const isQuery2XL = useIs2XL();
   const isQueryXL = useIsXL();
   const {
-    dateTime,
     id,
     created_at,
     entryOne,
@@ -49,19 +47,23 @@ function TRow({ point }: TRowPointProps) {
     exitOne,
     exitTwo,
     holiday,
-    bankBalance: { lunch, totalTimePoint, statusPoint, bonusTimePoint },
+    bankBalance: { bonus, status, timeLunch, totalTime },
   } = point;
 
-  const dateLg = format(new Date(created_at), "dd 'de' MMMM, EEEE", {
-    locale: ptBR,
-  });
+  const entryOneTimeString = TimeMinutesToString(entryOne);
+  const exitOneTimeString = TimeMinutesToString(exitOne);
+  const entryTwoTimeString = TimeMinutesToString(entryTwo);
+  const exitTwoTimeString = TimeMinutesToString(exitTwo);
 
-  const dateMd = format(new Date(created_at), "dd/MM/yyyy", {
-    locale: ptBR,
-  });
+  const bonusTimeString = TimeMinutesToString(bonus);
+  const timeLunchTimeString = TimeMinutesToString(timeLunch);
+  const totalTimeTimeString = TimeMinutesToString(totalTime);
 
-  const lunchTimeLg = `${exitOne} - ${entryTwo} (${lunch})`;
-  const lunchTimeMd = `(${lunch})`;
+  const dateLg = dayjs(created_at).format("DD [de] MMMM, dddd");
+  const dateMd = dayjs(created_at).format("DD/MM/YYYY");
+
+  const lunchTimeLg = `${exitOneTimeString} - ${entryTwoTimeString} (${timeLunchTimeString})`;
+  const lunchTimeMd = `(${timeLunchTimeString})`;
 
   return (
     <tr
@@ -72,19 +74,19 @@ function TRow({ point }: TRowPointProps) {
       }`}
     >
       <td className="py-1 px-6">{isQuery2XL ? dateLg : dateMd}</td>
-      <td className="py-1 px-6 hidden lg:table-cell">{entryOne}</td>
+      <td className="py-1 px-6 hidden lg:table-cell">{entryOneTimeString}</td>
       <td className="py-1 px-6 hidden lg:table-cell">
         {isQueryXL ? lunchTimeLg : lunchTimeMd}
       </td>
-      <td className="py-1 px-6 hidden md:table-cell">{exitTwo}</td>
-      <td className="py-1 px-6 hidden sm:table-cell">{totalTimePoint}</td>
+      <td className="py-1 px-6 hidden md:table-cell">{exitTwoTimeString}</td>
+      <td className="py-1 px-6 hidden sm:table-cell">{totalTimeTimeString}</td>
       <td className="py-1 px-6 flex items-center gap-2">
-        {bonusTimePoint}
+        {bonusTimeString}
         <div
           className={`w-2 h-2 rounded-full ${
-            statusPoint === "UP"
+            status === "UP"
               ? "bg-green-400"
-              : statusPoint === "DOWN" && !holiday
+              : status === "DOWN" && !holiday
               ? "bg-red-400"
               : holiday
               ? "bg-blue-600"
@@ -95,11 +97,6 @@ function TRow({ point }: TRowPointProps) {
       <td className="py-1 px-6">
         <div className="flex items-center gap-1">
           <ModalDeletePoint idPoint={id} />
-          {/* <ClipboardText
-            onClick={() => onSetPointSelected(point)}
-            size={20}
-            className="text-gray-300 transition-all hover:text-gray-100 hover:cursor-pointer"
-          /> */}
         </div>
       </td>
     </tr>
@@ -109,13 +106,13 @@ function TRow({ point }: TRowPointProps) {
 export function Table() {
   const isQueryXL = useIsXL();
   const isQuery2XL = useIs2XL();
-  const { points, isLoadingPoints } = useTime();
+  const { dataByMonth, isLoadingPoints } = useTime();
 
   if (isLoadingPoints) {
     return <div>Loading...</div>;
   }
 
-  if (points.length === 0) {
+  if (dataByMonth?.points.length === 0) {
     return <EmptyDataTable />;
   }
 
@@ -141,36 +138,7 @@ export function Table() {
         </tr>
       </thead>
       <tbody>
-        {points.map((point) => {
-          return <TRow key={point.id} point={point} />;
-        })}
-      </tbody>
-    </table>
-  );
-
-  return (
-    <table className="table-auto border-collapse rounded-lg w-full">
-      <thead className="text-left m-2 bg-slate-700 text-slate-400 text-sm">
-        <tr>
-          <THead
-            title="Data"
-            classNameString={`${!isQuery2XL ? "w-[180px]" : "w-[295px]"} `}
-          />
-          <THead title="Entrada" classNameString="hidden lg:table-cell" />
-          <THead
-            title="Almoço"
-            classNameString={`${
-              isQueryXL ? "w-[250px]" : "w-[150px]"
-            } hidden lg:table-cell`}
-          />
-          <THead title="Saída" classNameString="hidden md:table-cell" />
-          <THead title="Total Horas" classNameString="hidden sm:table-cell" />
-          <THead title="Bonús" />
-          <THead title="Ações" />
-        </tr>
-      </thead>
-      <tbody className="text-sm text-slate-300">
-        {points.map((point) => {
+        {dataByMonth?.points.map((point) => {
           return <TRow key={point.id} point={point} />;
         })}
       </tbody>

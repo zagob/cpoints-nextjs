@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { timeStringToMinutes } from "../../../../utils/timeStringToMinutes";
 import { updateDoc, doc, db } from "../index";
 
 const InfoUserSchema = z.object({
@@ -6,7 +7,7 @@ const InfoUserSchema = z.object({
   entryTwo: z.number().max(480, { message: "Formato de time inválido" }),
   exitOne: z.number().max(480, { message: "Formato de time inválido" }),
   exitTwo: z.number().max(480, { message: "Formato de time inválido" }),
-  totalHours: z.string(),
+  totalHours: z.number().max(480, { message: "Formato de time inválido" }),
 });
 
 type InfoUserProps = z.infer<typeof InfoUserSchema>;
@@ -16,8 +17,8 @@ export async function infoUser(idUser: string, infoUser: InfoUserProps) {
   await updateDoc(doc(db, "users", idUser), {
     infoUser: {
       entryOne,
-      entryTwo,
       exitOne,
+      entryTwo,
       exitTwo,
       totalHours,
     },

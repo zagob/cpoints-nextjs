@@ -1,7 +1,6 @@
 import "../styles/globals.css";
-
-// import "react-day-picker/dist/style.css";
 import "../styles/custom-dayPicker.css";
+import "../lib/dayjs";
 import { QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import type { AppProps } from "next/app";

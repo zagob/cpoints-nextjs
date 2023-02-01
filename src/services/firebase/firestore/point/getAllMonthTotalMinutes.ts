@@ -1,51 +1,73 @@
 import { MessageErr } from "../../../../errors/returnMessageError";
 import { query, collection, where, getDocs, db } from "../index";
 
+export interface DataAllMonthOfYear {
+  month: string;
+  totalMinutesMonth: number;
+}
+
 export async function getAllMonthTotalMinutes(idUser: string, year: string) {
   try {
-    let arr = [];
-    for (let i = 1; i <= 12; i++) {
-      const q = query(
-        collection(db, `users/${idUser}/points`),
-        where("dateTime", "==", `${year}/${i.toString().padStart(2, "0")}`)
-      );
-      const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs;
+    const allMonthsAtSix = Array.from({ length: 6 }).map(
+      (_, index) => `${year}/${String(index + 1).padStart(2, "0")}`
+    );
+    const allMonthsOfSixAtEnd = Array.from({ length: 6 }).map(
+      (_, index) => `${year}/${String(index + 7).padStart(2, "0")}`
+    );
 
-      const filterRemoveHoliday = data.filter(
-        (item) => item.data().holiday !== true
-      );
+    const allMonthsOfYear = allMonthsAtSix
+      .concat(allMonthsOfSixAtEnd)
+      .map((month) => ({ month: month.split("/")[1].toString() }));
 
-      const totalMinutes = filterRemoveHoliday
-        .map((item) => {
-          const { bankBalance, holiday } = item.data();
+    const querySnapshotAllMonthsAtSix = await getDocs(
+      query(
+        collection(db, `users/${idUser}/pTest`),
+        where("dateTime", "in", allMonthsAtSix)
+      )
+    );
 
-          const [hour, minute] = bankBalance.bonusTimePoint
-            .split(":")
-            .map((item: string) => Number(item));
+    const querySnapshotAllMonthsOfSixAtEnd = await getDocs(
+      query(
+        collection(db, `users/${idUser}/pTest`),
+        where("dateTime", "in", allMonthsOfSixAtEnd)
+      )
+    );
 
-          const totalMinutes = hour * 60 + minute;
+    const returnQuerySnapshotAllMonthsAtSix = querySnapshotAllMonthsAtSix.docs
+      .map((item) => item.data())
+      .concat(querySnapshotAllMonthsOfSixAtEnd.docs.map((item) => item.data()));
 
-          return {
-            totalMinutes,
-            statusPoint: bankBalance.statusPoint,
-          };
-        })
+    const monthsOfTotalMinutes = allMonthsOfYear.map((month) => ({
+      ...month,
+      totalMinutesMonth: returnQuerySnapshotAllMonthsAtSix
+        .filter((item) => item.dateTime.split("/")[1] === month.month ?? [])
+        .map((item) => ({
+          holiday: item.holiday,
+          bankBalance: {
+            bonus: item.bankBalance.bonus,
+            status: item.bankBalance.status,
+          },
+        }))
         .reduce((acc, value) => {
-          if (value.statusPoint === "UP") {
-            acc += value.totalMinutes;
+          const bonus = value.bankBalance.bonus;
+
+          if (value.holiday) {
+            return acc;
           }
-          if (value.statusPoint === "DOWN") {
-            acc -= value.totalMinutes;
+
+          if (value.bankBalance.status === "UP") {
+            acc += bonus;
+          }
+
+          if (value.bankBalance.status === "DOWN") {
+            acc -= bonus;
           }
 
           return acc;
-        }, 0);
+        }, 0),
+    }));
 
-      arr.push(totalMinutes);
-    }
-
-    return arr;
+    return monthsOfTotalMinutes.map((item) => item.totalMinutesMonth);
   } catch (err) {
     return MessageErr(false, "Erro ao filtrar dados");
   }

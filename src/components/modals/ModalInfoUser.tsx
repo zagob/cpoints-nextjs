@@ -1,11 +1,10 @@
-import { doc, updateDoc } from "firebase/firestore";
 import { Pencil, UserList } from "phosphor-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
-import { api } from "../../services/api";
-import { db } from "../../services/firebase/firestore";
+import { infoUser } from "../../services/firebase/firestore/user/infoUser";
+import { timeStringToMinutes } from "../../utils/timeStringToMinutes";
 import { Button } from "../Button";
 import { InputMask } from "../InputMask";
 import { ModalRadix } from "../ModalRadix";
@@ -21,7 +20,7 @@ interface ModalInfoUserProps {
 export function ModalInfoUser() {
   const { user, onSetUserInfo } = useAuth();
   const [modal, setModal] = useState(false);
-  const { handleSubmit, register, setValue } = useForm<ModalInfoUserProps>({
+  const { handleSubmit, register } = useForm<ModalInfoUserProps>({
     defaultValues: {
       entryOne: user?.infoUser?.entryOne,
       exitOne: user?.infoUser?.exitOne,
@@ -32,16 +31,26 @@ export function ModalInfoUser() {
   });
 
   async function handleSubmitForm(data: ModalInfoUserProps) {
-    await updateDoc(doc(db, `users`, user?.id!), {
-      infoUser: data,
-    });
-    toast.success(
-      `Informações ${
-        user?.infoUser ? "atualizadas" : "adicionadas"
-      } com sucesso!`
-    );
-    setModal(false);
-    await onSetUserInfo(data);
+    const { entryOne, exitOne, entryTwo, exitTwo, totalHours } = data;
+    try {
+      await infoUser(user?.id!, {
+        entryOne: timeStringToMinutes(entryOne),
+        exitOne: timeStringToMinutes(exitOne),
+        entryTwo: timeStringToMinutes(entryTwo),
+        exitTwo: timeStringToMinutes(exitTwo),
+        totalHours: timeStringToMinutes(totalHours),
+      });
+
+      toast.success(
+        `Informações ${
+          user?.infoUser ? "atualizadas" : "adicionadas"
+        } com sucesso!`
+      );
+      setModal(false);
+      await onSetUserInfo(data);
+    } catch (err) {
+      toast.error(`Erro ao atualizar informações do usuário`);
+    }
   }
 
   return (
