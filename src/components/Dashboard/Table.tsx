@@ -4,11 +4,10 @@ import { useIs2XL, useIsXL } from "../../utils/mediaQueryHook";
 import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 import { EmptyDataTable } from "../EmptyDataTable";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
-
-interface THeadProps {
-  title: string;
-  classNameString?: string;
-}
+import * as Checkbox from "@radix-ui/react-checkbox";
+import clsx from "clsx";
+import { useEffect, useState } from "react";
+import { ModalDeletePointsSelected } from "../modals/ModalDeletePointsSelected";
 
 export interface TRowPointProps {
   point: {
@@ -31,82 +30,12 @@ export interface TRowPointProps {
   };
 }
 
-function THead({ title, classNameString }: THeadProps) {
-  return <th className={`pl-6 py-1 ${classNameString}`}>{title}</th>;
-}
-
-function TRow({ point }: TRowPointProps) {
-  const { pointSelected } = useTime();
-  const isQuery2XL = useIs2XL();
-  const isQueryXL = useIsXL();
-  const {
-    id,
-    created_at,
-    entryOne,
-    entryTwo,
-    exitOne,
-    exitTwo,
-    holiday,
-    bankBalance: { bonus, status, timeLunch, totalTime },
-  } = point;
-
-  const entryOneTimeString = TimeMinutesToString(entryOne);
-  const exitOneTimeString = TimeMinutesToString(exitOne);
-  const entryTwoTimeString = TimeMinutesToString(entryTwo);
-  const exitTwoTimeString = TimeMinutesToString(exitTwo);
-
-  const bonusTimeString = TimeMinutesToString(bonus);
-  const timeLunchTimeString = TimeMinutesToString(timeLunch);
-  const totalTimeTimeString = TimeMinutesToString(totalTime);
-
-  const dateLg = dayjs(created_at).format("DD [de] MMMM, dddd");
-  const dateMd = dayjs(created_at).format("DD/MM/YYYY");
-
-  const lunchTimeLg = `${exitOneTimeString} - ${entryTwoTimeString} (${timeLunchTimeString})`;
-  const lunchTimeMd = `(${timeLunchTimeString})`;
-
-  return (
-    <tr
-      className={`bg-slate-800 border-b border-b-slate-700 font-light ${
-        !holiday && "hover:brightness-150 cursor-default"
-      } ${holiday && "opacity-70 bg-slate-900"} ${
-        pointSelected?.id === id && "brightness-150"
-      }`}
-    >
-      <td className="py-1 px-6">{isQuery2XL ? dateLg : dateMd}</td>
-      <td className="py-1 px-6 hidden lg:table-cell">{entryOneTimeString}</td>
-      <td className="py-1 px-6 hidden lg:table-cell">
-        {isQueryXL ? lunchTimeLg : lunchTimeMd}
-      </td>
-      <td className="py-1 px-6 hidden md:table-cell">{exitTwoTimeString}</td>
-      <td className="py-1 px-6 hidden sm:table-cell">{totalTimeTimeString}</td>
-      <td className="py-1 px-6 flex items-center gap-2">
-        {bonusTimeString}
-        <div
-          className={`w-2 h-2 rounded-full ${
-            status === "UP"
-              ? "bg-green-400"
-              : status === "DOWN" && !holiday
-              ? "bg-red-400"
-              : holiday
-              ? "bg-blue-600"
-              : "bg-gray-400"
-          }`}
-        />
-      </td>
-      <td className="py-1 px-6">
-        <div className="flex items-center gap-1">
-          <ModalDeletePoint idPoint={id} />
-        </div>
-      </td>
-    </tr>
-  );
-}
-
 export function Table() {
   const isQueryXL = useIsXL();
   const isQuery2XL = useIs2XL();
   const { dataByMonth, isLoadingPoints } = useTime();
+  const [checkAllPoints, setCheckAllPoints] = useState(false);
+  const [checkPoints, setCheckPoints] = useState<string[]>([]);
 
   if (isLoadingPoints) {
     return <div>Loading...</div>;
@@ -117,31 +46,128 @@ export function Table() {
   }
 
   return (
-    <table className="table-auto w-full border-collapse rounded-lg text-left text-sm">
-      <thead className="bg-slate-700 text-slate-400">
-        <tr>
-          <THead
-            title="Data"
-            classNameString={`${!isQuery2XL ? "w-[180px]" : "w-[295px]"} `}
-          />
-          <THead title="Entrada" classNameString="hidden lg:table-cell" />
-          <THead
-            title="Almoço"
-            classNameString={`${
-              isQueryXL ? "w-[250px]" : "w-[150px]"
-            } hidden lg:table-cell`}
-          />
-          <THead title="Saída" classNameString="hidden md:table-cell" />
-          <THead title="Total Horas" classNameString="hidden sm:table-cell" />
-          <THead title="Bonús" />
-          <THead title="Ações" />
-        </tr>
-      </thead>
-      <tbody>
-        {dataByMonth?.points.map((point) => {
-          return <TRow key={point.id} point={point} />;
-        })}
-      </tbody>
-    </table>
+    <div className="bg-zinc-800 h-[65%] flex flex-col justify-end">
+      <div className="flex items-center justify-between m-2">
+        <h4 className="text-lg font-bold py-1">Tabela de Pontos</h4>
+        {checkPoints.length > 0 && (
+          <ModalDeletePointsSelected idPoints={checkPoints} />
+        )}
+      </div>
+      <section className="h-[100%] overflow-auto rounded relative">
+        <table className="table-auto w-full border-collapse rounded-lg text-sm">
+          <thead className="bg-slate-700 text-slate-400">
+            <tr className="text-left">
+              <th className="px-2 py-1">
+                <Checkbox.Root
+                  id="holiday"
+                  className="bg-zinc-900 rounded-md w-3 h-[10px] p-[10px] flex justify-center items-center border border-zinc-700 data-[state=checked]:bg-green-500"
+                  checked={checkAllPoints}
+                  onCheckedChange={(e: boolean) => {
+                    if (e) {
+                      setCheckPoints(
+                        dataByMonth?.points.map((point) => point.id)!
+                      );
+                      setCheckAllPoints(true);
+                    } else {
+                      setCheckPoints([]);
+                      setCheckAllPoints(false);
+                    }
+                  }}
+                ></Checkbox.Root>
+              </th>
+              <th className="px-2 py-1">Data</th>
+              <th className="px-2 py-1">Entrada</th>
+              <th className="px-2 py-1">Almoço</th>
+              <th className="px-2 py-1">Saída</th>
+              <th className="px-2 py-1">Total Horas</th>
+              <th className="px-2 py-1">Bonús</th>
+              <th className="px-2 py-1">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dataByMonth?.points.map((point) => {
+              const entryOneTimeString = TimeMinutesToString(point.entryOne);
+              const exitOneTimeString = TimeMinutesToString(point.exitOne);
+              const entryTwoTimeString = TimeMinutesToString(point.entryTwo);
+              const exitTwoTimeString = TimeMinutesToString(point.exitTwo);
+
+              const bonusTimeString = TimeMinutesToString(
+                point.bankBalance.bonus
+              );
+              const timeLunchTimeString = TimeMinutesToString(
+                point.bankBalance.timeLunch
+              );
+              const totalTimeTimeString = TimeMinutesToString(
+                point.bankBalance.totalTime
+              );
+
+              const dateLg = dayjs(point.created_at).format(
+                "DD [de] MMMM, dddd"
+              );
+              const dateMd = dayjs(point.created_at).format("DD/MM/YYYY");
+
+              const lunchTimeLg = `${exitOneTimeString} - ${entryTwoTimeString} (${timeLunchTimeString})`;
+              const lunchTimeMd = `(${timeLunchTimeString})`;
+              return (
+                <tr
+                  key={point.id}
+                  className={clsx(
+                    "bg-slate-800 border-b border-b-slate-700 font-light",
+                    {
+                      ["hover:brightness-150 cursor-default"]: !point.holiday,
+                      ["opacity-70 bg-slate-900"]: point.holiday,
+                    }
+                  )}
+                >
+                  <td className="px-2">
+                    <Checkbox.Root
+                      id="holiday"
+                      className="bg-zinc-900 rounded-md w-3 h-[10px] p-[10px] flex justify-center items-center border border-zinc-700 data-[state=checked]:bg-green-500"
+                      checked={checkPoints.includes(point.id)}
+                      onCheckedChange={(e: boolean) => {
+                        if (e) {
+                          setCheckPoints((old) => [...old, point.id]);
+                          setCheckAllPoints(
+                            checkPoints.length + 1 === dataByMonth.points.length
+                          );
+                        } else {
+                          setCheckPoints((old) =>
+                            old.filter((checkPoint) => checkPoint !== point.id)
+                          );
+                          setCheckAllPoints(false);
+                        }
+                      }}
+                    ></Checkbox.Root>
+                  </td>
+                  <td className="px-2">{isQuery2XL ? dateLg : dateMd}</td>
+                  <td className="px-2">{entryOneTimeString}</td>
+                  <td className="px-2">
+                    {isQueryXL ? lunchTimeLg : lunchTimeMd}
+                  </td>
+                  <td className="px-2">{exitTwoTimeString}</td>
+                  <td className="px-2">{totalTimeTimeString}</td>
+                  <td className="px-2 flex items-center gap-2">
+                    {bonusTimeString}
+                    <div
+                      className={clsx("w-2 h-2 rounded-full", {
+                        ["bg-green-400"]: point.bankBalance.status === "UP",
+                        ["bg-red-400"]:
+                          point.bankBalance.status === "DOWN" && !point.holiday,
+                        ["bg-gray-400"]: point.bankBalance.status === "EQUAL",
+                        ["bg-blue-600"]:
+                          point.bankBalance.status === "DOWN" && point.holiday,
+                      })}
+                    />
+                  </td>
+                  <td className="px-2">
+                    <ModalDeletePoint idPoint={point.id} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+    </div>
   );
 }

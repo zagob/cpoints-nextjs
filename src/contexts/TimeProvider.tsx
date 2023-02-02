@@ -7,7 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import { createPoint } from "../services/firebase/firestore/point/createPoint";
 import { deletePoint } from "../services/firebase/firestore/point/deletePoint";
 import {
-  DataAllMonthOfYear,
+  DataAllMonthOfYearProps,
   getAllMonthTotalMinutes,
 } from "../services/firebase/firestore/point/getAllMonthTotalMinutes";
 import {
@@ -28,11 +28,9 @@ interface TimeContextProps {
   monthSelected: string;
   isLoadingPoints: boolean;
   isLoadingGetAllMontOfYear: boolean;
-  dataAllMonthOfYear:
-    | DataAllMonthOfYear[]
-    | { success: boolean; message: string }
-    | undefined;
+  dataAllMonthOfYear: DataAllMonthOfYearProps;
   dataByMonth: DataByMonthProps | undefined;
+  isDateSelectedExist: boolean;
 }
 
 interface TimeProviderProps {
@@ -89,6 +87,13 @@ export function TimeProvider({ children }: TimeProviderProps) {
     refetchOnWindowFocus: false,
   });
 
+  const isDateSelectedExist =
+    dataByMonth?.points.some((point) =>
+      dayjs(point.created_at)
+        .format("YYYY/MM/DD")
+        .includes(dayjs(dateSelected).format("YYYY/MM/DD"))
+    ) ?? false;
+
   const {
     data: dataAllMonthOfYear,
     refetch: refetchAllMonth,
@@ -97,8 +102,6 @@ export function TimeProvider({ children }: TimeProviderProps) {
     queryKey: ["getAllMonth", year],
     queryFn: async () => {
       const result = await getAllMonthTotalMinutes(user?.id!, year);
-
-      console.log("result", result);
 
       return result;
     },
@@ -164,8 +167,6 @@ export function TimeProvider({ children }: TimeProviderProps) {
 
     refetch();
     refetchAllMonth();
-
-    toast.success("Ponto cadastrada com sucesso!");
   }
 
   function onSetPointSelected(point: PointsProps | null) {
@@ -209,6 +210,7 @@ export function TimeProvider({ children }: TimeProviderProps) {
         pointSelected,
         monthSelected,
         dataAllMonthOfYear,
+        isDateSelectedExist,
         dataByMonth,
         isLoadingPoints,
         isLoadingGetAllMontOfYear,

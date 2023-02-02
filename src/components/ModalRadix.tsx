@@ -29,7 +29,9 @@ export function ModalRadix({
         <Dialog.Content
           className={`fixed z-50 rounded gap-4 p-4 bg-zinc-700 shadow-md shadow-zinc-700 top-[50%] left-[50%] w-[400px] -translate-y-1/2 -translate-x-1/2 flex flex-col items-center animateModal ${classNameStyles}`}
         >
-          <Dialog.Title className="text-2xl mt-2">{title}</Dialog.Title>
+          <Dialog.Title className="text-lg font-bold mt-2">
+            {title}
+          </Dialog.Title>
           <div className="w-full flex-1 flex flex-col items-center">
             {children}
           </div>

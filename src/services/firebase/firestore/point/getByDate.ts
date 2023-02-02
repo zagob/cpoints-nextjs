@@ -26,7 +26,7 @@ export interface DataByMonthProps {
 
 export async function getByDate(idUser: string, month: string, year: string) {
   const queryOfMonthAndYear = query(
-    collection(db, `users/${idUser}/pTest`),
+    collection(db, `users/${idUser}/points`),
     where("dateTime", "==", `${year}/${month}`)
   );
 
@@ -59,8 +59,6 @@ export async function getByDate(idUser: string, month: string, year: string) {
 
     return acc;
   }, 0);
-
-  console.log("sortData", sortData);
 
   return { totalMinutesByMonth, points: sortData };
 }

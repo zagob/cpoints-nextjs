@@ -70,7 +70,7 @@ export function Chart() {
   const series = [
     {
       name: "series1",
-      data: dataAllMonthOfYear as [],
+      data: dataAllMonthOfYear ?? [],
     },
   ];
   return (

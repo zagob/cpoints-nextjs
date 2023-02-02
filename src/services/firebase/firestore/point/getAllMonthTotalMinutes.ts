@@ -1,10 +1,7 @@
 import { MessageErr } from "../../../../errors/returnMessageError";
 import { query, collection, where, getDocs, db } from "../index";
 
-export interface DataAllMonthOfYear {
-  month: string;
-  totalMinutesMonth: number;
-}
+export type DataAllMonthOfYearProps = number[] | undefined;
 
 export async function getAllMonthTotalMinutes(idUser: string, year: string) {
   try {
@@ -21,14 +18,14 @@ export async function getAllMonthTotalMinutes(idUser: string, year: string) {
 
     const querySnapshotAllMonthsAtSix = await getDocs(
       query(
-        collection(db, `users/${idUser}/pTest`),
+        collection(db, `users/${idUser}/points`),
         where("dateTime", "in", allMonthsAtSix)
       )
     );
 
     const querySnapshotAllMonthsOfSixAtEnd = await getDocs(
       query(
-        collection(db, `users/${idUser}/pTest`),
+        collection(db, `users/${idUser}/points`),
         where("dateTime", "in", allMonthsOfSixAtEnd)
       )
     );
@@ -69,6 +66,6 @@ export async function getAllMonthTotalMinutes(idUser: string, year: string) {
 
     return monthsOfTotalMinutes.map((item) => item.totalMinutesMonth);
   } catch (err) {
-    return MessageErr(false, "Erro ao filtrar dados");
+    return Array.from({ length: 12 }).map((_, i) => i + 1);
   }
 }

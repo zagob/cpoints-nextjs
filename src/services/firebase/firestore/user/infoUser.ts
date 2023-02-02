@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { timeStringToMinutes } from "../../../../utils/timeStringToMinutes";
 import { updateDoc, doc, db } from "../index";
 
 const InfoUserSchema = z.object({

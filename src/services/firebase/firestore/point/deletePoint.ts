@@ -7,6 +7,6 @@ export async function deletePoint(idUser: string, idPoint: string) {
 
     return MessageErr(true, "Ponto deletado com sucesso!");
   } catch (err) {
-    return MessageErr(false, "Falha ao delete Ponto");
+    return MessageErr(false, "Falha ao deletar Ponto");
   }
 }

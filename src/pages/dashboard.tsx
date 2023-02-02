@@ -9,13 +9,6 @@ import { Loading } from "../components/Loading";
 import { LoadingDataTable } from "../components/LoadingDataTable";
 import { useAuth } from "../hooks/useAuth";
 import { useTime } from "../hooks/useTime";
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
-import { db } from "../services/firebase/firestore";
-import dayjs from "dayjs";
-
-import { BankBalanceTime } from "../utils/transformBankBalanceTime";
-import { createPoint } from "../services/firebase/firestore/point/createPoint";
-import { timeStringToMinutes } from "../utils/timeStringToMinutes";
 
 export default function Dashboard() {
   const [dropdown, setDropdown] = useState(false);
@@ -25,53 +18,6 @@ export default function Dashboard() {
   if (isLoading || !user) {
     return <Loading />;
   }
-
-  async function addPoint() {
-    const p = collection(db, `users/${user?.id!}/points`);
-    const docSnap = await getDocs(p);
-
-    const data = docSnap.docs.map((item) => item.data());
-
-    console.log(data);
-
-    data.map(async (point) => {
-      await createPoint(
-        String(user?.id),
-        {
-          entryOne: timeStringToMinutes(point.entryOne),
-          exitOne: timeStringToMinutes(point.exitOne),
-          entryTwo: timeStringToMinutes(point.entryTwo),
-          exitTwo: timeStringToMinutes(point.exitTwo),
-          holiday: point.holiday ?? false,
-          created_at: point.created_at,
-          dateTime: point.dateTime,
-        },
-        480
-      );
-    });
-
-    // points.map(async (point) => {
-    //   await createPoint(
-    //     user?.id!,
-    //     {
-    //       entryOne: point.entryOne,
-    //       exitOne: point.exitOne,
-    //       entryTwo: point.entryTwo,
-    //       exitTwo: point.exitTwo,
-    //       holiday: point.holiday ?? false,
-    //       created_at: point.created_at,
-    //       dateTime: point.dateTime,
-    //     },
-    //     480
-    //   );
-    // });
-  }
-
-  // return (
-  //   <div className="flex flex-col gap-10">
-  //     <button onClick={addPoint}>get all points</button>
-  //   </div>
-  // );
 
   return (
     <div className="h-screen flex flex-col relative overflow-x-hidden">
@@ -112,9 +58,9 @@ export default function Dashboard() {
           <AsideAddPoint />
         </section>
         <div className="flex-1 hidden sm:flex flex-col gap-2">
-          <section className="bg-zinc-800 h-[65%] overflow-auto rounded relative">
-            {isLoadingPoints ? <LoadingDataTable /> : <Table />}
-          </section>
+          {/* <section className="bg-zinc-800 h-[65%] overflow-auto rounded relative"> */}
+          <Table />
+          {/* </section> */}
           <section className="bg-zinc-800 flex-1 rounded">
             <Chart />
           </section>

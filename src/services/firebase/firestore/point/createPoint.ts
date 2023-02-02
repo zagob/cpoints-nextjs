@@ -1,6 +1,8 @@
 import { doc, db, collection, setDoc } from "../index";
 import { z } from "zod";
 import { BankBalanceTime } from "../../../../utils/transformBankBalanceTime";
+import toast from "react-hot-toast";
+import dayjs from "dayjs";
 
 const DataPointSchema = z.object({
   entryOne: z.number().max(480, { message: "Número maior que o permitido" }),
@@ -32,11 +34,31 @@ export async function createPoint(
   const validadeDate = Date.parse(created_at);
 
   if (isNaN(validadeDate)) {
-    return { success: false, message: "Data invalida" };
+    return toast.error("Data inválida");
   }
 
-  if (entryOne > exitOne || exitOne > entryTwo) {
-    return { success: false, message: "Preencha corretamente os valores" };
+  if (!holiday) {
+    if (entryOne >= exitOne || entryOne >= entryTwo || entryOne >= exitTwo) {
+      return toast.error("Preencha corretamente os valores");
+    }
+    if (exitOne >= entryTwo || exitOne >= exitTwo) {
+      return toast.error("Preencha corretamente os valores");
+    }
+    if (entryTwo >= exitTwo) {
+      return toast.error("Preencha corretamente os valores");
+    }
+
+    // number in minutes
+    const endHour = 1439; // 23:59
+
+    if (
+      entryTwo > endHour ||
+      exitOne > endHour ||
+      entryTwo > endHour ||
+      exitTwo > endHour
+    ) {
+      return toast.error("é permitido horários de até 23:59");
+    }
   }
 
   const bankBalance = BankBalanceTime(totalHours, {
@@ -57,10 +79,12 @@ export async function createPoint(
     holiday,
   };
 
-  const newDataPointRef = doc(collection(db, `users/${idUser}/pTest`));
+  const newDataPointRef = doc(collection(db, `users/${idUser}/points`));
 
   await setDoc(newDataPointRef, {
     ...dataPoint,
     id: newDataPointRef.id,
   });
+
+  toast.success("Ponto cadastrada com sucesso!");
 }

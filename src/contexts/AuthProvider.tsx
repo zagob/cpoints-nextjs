@@ -101,6 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!user?.id) {
       return;
     }
+
     const { data } = await existUserIdById(user.id);
 
     setUser(data as UserProps);

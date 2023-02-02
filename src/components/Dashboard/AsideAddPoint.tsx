@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { ArrowRight, Check } from "phosphor-react";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import ptBr from "date-fns/locale/pt";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 
 import { InputMask } from "../../components/InputMask";
@@ -15,10 +16,29 @@ import { useTime } from "../../hooks/useTime";
 import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 
 const DataFormSchema = z.object({
-  entryOne: z.string(),
-  exitOne: z.string(),
-  entryTwo: z.string(),
-  exitTwo: z.string(),
+  entryOne: z
+    .string()
+    .min(5, { message: "Valor requerido é de 4 digitos numericos" })
+    .max(5, { message: "Valor requerido é de 4 digitos numericos" }),
+  exitOne: z
+    .string()
+    .min(5, { message: "Valor requerido é de 4 digitos numericos" })
+    .max(5, { message: "Valor requerido é de 4 digitos numericos" }),
+  entryTwo: z
+    .string()
+    .min(5, { message: "Valor requerido é de 4 digitos numericos" })
+    .max(5, { message: "Valor requerido é de 4 digitos numericos" }),
+  exitTwo: z
+    .string()
+    .min(5, { message: "Valor requerido é de 4 digitos numericos" })
+    .max(5, { message: "Valor requerido é de 4 digitos numericos" }),
+});
+
+const DataFormSchemaHoliday = z.object({
+  entryOne: z.string().transform(() => "00:00"),
+  exitOne: z.string().transform(() => "00:00"),
+  entryTwo: z.string().transform(() => "00:00"),
+  exitTwo: z.string().transform(() => "00:00"),
 });
 
 export type DataFormProps = z.infer<typeof DataFormSchema>;
@@ -98,13 +118,14 @@ export function AsideAddPoint() {
     onAddPointTime,
     pointSelected,
     dataByMonth,
+    isDateSelectedExist,
   } = useTime();
   const {
     handleSubmit,
     register,
-    setValue,
     reset,
-    formState: { dirtyFields },
+    watch,
+    formState: { dirtyFields, errors },
   } = useForm<DataFormProps>({
     defaultValues: {
       entryOne: "",
@@ -112,25 +133,17 @@ export function AsideAddPoint() {
       exitOne: "",
       exitTwo: "",
     },
+    resolver: holiday
+      ? zodResolver(DataFormSchemaHoliday)
+      : zodResolver(DataFormSchema),
   });
 
   async function handleSubmitData(data: DataFormProps) {
     setLoading(true);
-    let dataTimeFormat = {
-      ...data,
-    };
 
-    if (holiday) {
-      dataTimeFormat = {
-        entryOne: "00:00",
-        exitOne: "00:00",
-        entryTwo: "00:00",
-        exitTwo: "00:00",
-      };
-    }
-
-    await onAddPointTime(dataTimeFormat, holiday);
+    await onAddPointTime(data, holiday);
     setLoading(false);
+    setHoliday(false);
     reset();
   }
 
@@ -148,30 +161,6 @@ export function AsideAddPoint() {
   const isValueHasString = entryOne && entryTwo && exitOne && exitTwo;
 
   const isHoliday = holiday;
-
-  useEffect(() => {
-    if (pointSelected) {
-      setValue(
-        "entryOne",
-        pointSelected.entryOne === "00:00" ? "" : pointSelected.entryOne
-      );
-      setValue(
-        "entryTwo",
-        pointSelected.entryTwo === "00:00" ? "" : pointSelected.entryTwo
-      );
-      setValue(
-        "exitOne",
-        pointSelected.exitOne === "00:00" ? "" : pointSelected.exitOne
-      );
-      setValue(
-        "exitTwo",
-        pointSelected.exitTwo === "00:00" ? "" : pointSelected.exitTwo
-      );
-      setHoliday(pointSelected.holiday);
-    }
-
-    return () => {};
-  }, [pointSelected]);
 
   return (
     <div className="flex flex-col h-full justify-center items-center">
@@ -233,6 +222,7 @@ export function AsideAddPoint() {
               id="entryOne"
               register={register("entryOne")}
               disabledInput={isHoliday}
+              watchValue={watch("entryOne")}
             />
           </div>
           <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
@@ -243,6 +233,7 @@ export function AsideAddPoint() {
               id="exitOne"
               register={register("exitOne")}
               disabledInput={isHoliday}
+              watchValue={watch("exitOne")}
             />
           </div>
         </div>
@@ -255,6 +246,7 @@ export function AsideAddPoint() {
               id="entryTwo"
               register={register("entryTwo")}
               disabledInput={isHoliday}
+              watchValue={watch("entryTwo")}
             />
           </div>
           <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
@@ -265,6 +257,7 @@ export function AsideAddPoint() {
               id="exitTwo"
               register={register("exitTwo")}
               disabledInput={isHoliday}
+              watchValue={watch("exitTwo")}
             />
           </div>
         </div>
@@ -306,7 +299,14 @@ export function AsideAddPoint() {
         <div className="flex justify-center w-full">
           <Button
             type="submit"
-            disabled={loading}
+            disabled={
+              loading ||
+              isDateSelectedExist ||
+              (!isHoliday && watch("entryOne").length <= 4) ||
+              (!isHoliday && watch("exitOne").length <= 4) ||
+              (!isHoliday && watch("entryTwo").length <= 4) ||
+              (!isHoliday && watch("exitTwo").length <= 4)
+            }
             classNameStyle="w-full"
             statusColor="green"
           >
