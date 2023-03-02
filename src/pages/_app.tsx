@@ -18,7 +18,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
         </TimeProvider>
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen />
+      {/* <ReactQueryDevtools initialIsOpen /> */}
     </QueryClientProvider>
   );
 }

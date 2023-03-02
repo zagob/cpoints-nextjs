@@ -19,6 +19,28 @@ export default function Dashboard() {
     return <Loading />;
   }
 
+  // return (
+  //   <main className="border grid h-screen gap-2 p-2 relative">
+  //     <section className="bg-zinc-800 h-full">
+  //       <AsideAddPoint />
+  //     </section>
+  //     <motion.div
+  //       animate={dropdown ? { right: 0 } : { right: "-100%" }}
+  //       // transition={{ duration: 0.5 }}
+  //       className="absolute w-full border h-full bg-zinc-700 z-10 grid"
+  //     >
+  //       <div
+  //         className="bg-black absolute w-12 left-0"
+  //         onClick={() => setDropdown((old) => !old)}
+  //       >
+  //         <List size={32} className="pl-1" />
+  //       </div>
+  //       <section className="bg-zinc-800">table</section>
+  //       <section className="bg-zinc-800">gráfico</section>
+  //     </motion.div>
+  //   </main>
+  // );
+
   return (
     <div className="h-screen flex flex-col relative overflow-x-hidden">
       <Header />
