@@ -14,6 +14,7 @@ import { Button } from "../Button";
 import { useAuth } from "../../hooks/useAuth";
 import { useTime } from "../../hooks/useTime";
 import { TimeMinutesToString } from "../../utils/timeMinutesToString";
+import { Header } from "./Header";
 
 const DataFormSchema = z.object({
   entryOne: z
@@ -163,161 +164,164 @@ export function AsideAddPoint() {
   const isHoliday = holiday;
 
   return (
-    <div className="flex flex-col h-full justify-center items-center">
-      {!pointSelected && (
-        <ClockTimeStatus
-          bonusTotalMinutesStatus={bonusTotalMinutesStatus}
-          hours={hours}
-          minutes={minutes}
-        />
-      )}
-      <DayPicker
-        locale={ptBr}
-        mode="single"
-        selected={dateSelected}
-        onSelect={(date) => {
-          if (!date) {
-            return;
-          }
-          onSetDateSelected(date);
-        }}
-        disabled={[{ dayOfWeek: [0, 6] }, ...(disabledDays ?? [])]}
-        modifiers={{
-          available: { dayOfWeek: [1, 2, 3, 4, 5] },
-        }}
-        captionLayout="dropdown"
-        modifiersStyles={{
-          disabled: {
-            fontSize: "75%",
-            cursor: "not-allowed",
-            opacity: 0.4,
-          },
-        }}
-        onMonthChange={(date) => {
-          onSetPointSelected(null);
-          onSetMonthSelected(date);
-        }}
-        toYear={new Date().getFullYear()}
-        fromYear={2020}
-        footer={`Data Selecionada: ${format(
-          new Date(dateSelected),
-          "dd/MM/yyyy"
-        )}`}
-        styles={{
-          tfoot: {
-            height: "30px",
-            fontSize: "0.85rem",
-          },
-        }}
-      />
-      <form
-        onSubmit={handleSubmit(handleSubmitData)}
-        className="flex flex-col gap-2 w-[290px]"
-      >
-        <div className="flex justify-between items-center">
-          <div>
-            <label htmlFor="entryOne">Entrada 1:</label>
-            <InputMask
-              disabled={!user?.infoUser}
-              id="entryOne"
-              register={register("entryOne")}
-              disabledInput={isHoliday}
-              watchValue={watch("entryOne")}
-            />
-          </div>
-          <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
-          <div>
-            <label htmlFor="exitOne">Saída 1:</label>
-            <InputMask
-              disabled={!user?.infoUser}
-              id="exitOne"
-              register={register("exitOne")}
-              disabledInput={isHoliday}
-              watchValue={watch("exitOne")}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center">
-          <div>
-            <label htmlFor="entryTwo">Entrada 2:</label>
-            <InputMask
-              disabled={!user?.infoUser}
-              id="entryTwo"
-              register={register("entryTwo")}
-              disabledInput={isHoliday}
-              watchValue={watch("entryTwo")}
-            />
-          </div>
-          <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
-          <div>
-            <label htmlFor="exitTwo">Saída 2:</label>
-            <InputMask
-              disabled={!user?.infoUser}
-              id="exitTwo"
-              register={register("exitTwo")}
-              disabledInput={isHoliday}
-              watchValue={watch("exitTwo")}
-            />
-          </div>
-        </div>
-        <div className="flex items-center justify-between my-1">
-          <div className="flex items-center gap-2">
-            <Checkbox.Root
-              id="holiday"
-              className="bg-zinc-900 rounded-md w-3 h-3 p-3 flex justify-center items-center border border-zinc-700"
-              checked={holiday}
-              onCheckedChange={(e: boolean) => {
-                setHoliday(e);
-              }}
-            >
-              <Checkbox.Indicator>
-                <Check size={18} className="text-green-500" weight="bold" />
-              </Checkbox.Indicator>
-            </Checkbox.Root>
-            <label
-              htmlFor="holiday"
-              className="cursor-pointer text-zinc-200 font-bold text-md "
-            >
-              Feriado?
-            </label>
-          </div>
-
-          {isValueHasString && isHoliday && (
-            <div>
-              <button
-                className="text-red-600 hover:brightness-125 transition-all"
-                type="button"
-                onClick={() => reset()}
-              >
-                Limpar campos
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-center w-full">
-          <Button
-            type="submit"
-            disabled={
-              loading ||
-              isDateSelectedExist ||
-              (!isHoliday && watch("entryOne").length <= 4) ||
-              (!isHoliday && watch("exitOne").length <= 4) ||
-              (!isHoliday && watch("entryTwo").length <= 4) ||
-              (!isHoliday && watch("exitTwo").length <= 4)
+    <div className="bg-zinc-800 h-full relative rounded border-2 border-zinc-700 lg:w-[400px]">
+      <Header />
+      <div className="flex flex-col h-full justify-center items-center gap-2">
+        {!pointSelected && (
+          <ClockTimeStatus
+            bonusTotalMinutesStatus={bonusTotalMinutesStatus}
+            hours={hours}
+            minutes={minutes}
+          />
+        )}
+        <DayPicker
+          locale={ptBr}
+          mode="single"
+          selected={dateSelected}
+          onSelect={(date) => {
+            if (!date) {
+              return;
             }
-            classNameStyle="w-full"
-            statusColor="green"
-          >
-            {loading
-              ? "Enviando..."
-              : pointSelected
-              ? "Editar ponto"
-              : "Cadastrar novo ponto"}
-          </Button>
-        </div>
-      </form>
+            onSetDateSelected(date);
+          }}
+          disabled={[{ dayOfWeek: [0, 6] }, ...(disabledDays ?? [])]}
+          modifiers={{
+            available: { dayOfWeek: [1, 2, 3, 4, 5] },
+          }}
+          captionLayout="dropdown"
+          modifiersStyles={{
+            disabled: {
+              fontSize: "75%",
+              cursor: "not-allowed",
+              opacity: 0.4,
+            },
+          }}
+          onMonthChange={(date) => {
+            onSetPointSelected(null);
+            onSetMonthSelected(date);
+          }}
+          toYear={new Date().getFullYear()}
+          fromYear={2020}
+          footer={`Data Selecionada: ${format(
+            new Date(dateSelected),
+            "dd/MM/yyyy"
+          )}`}
+          styles={{
+            tfoot: {
+              height: "30px",
+              fontSize: "0.85rem",
+            },
+          }}
+        />
+        <form
+          onSubmit={handleSubmit(handleSubmitData)}
+          className="flex flex-col gap-2 w-[290px]"
+        >
+          <div className="flex justify-between items-center">
+            <div>
+              <label htmlFor="entryOne">Entrada 1:</label>
+              <InputMask
+                disabled={!user?.infoUser}
+                id="entryOne"
+                register={register("entryOne")}
+                disabledInput={isHoliday}
+                watchValue={watch("entryOne")}
+              />
+            </div>
+            <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
+            <div>
+              <label htmlFor="exitOne">Saída 1:</label>
+              <InputMask
+                disabled={!user?.infoUser}
+                id="exitOne"
+                register={register("exitOne")}
+                disabledInput={isHoliday}
+                watchValue={watch("exitOne")}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <div>
+              <label htmlFor="entryTwo">Entrada 2:</label>
+              <InputMask
+                disabled={!user?.infoUser}
+                id="entryTwo"
+                register={register("entryTwo")}
+                disabledInput={isHoliday}
+                watchValue={watch("entryTwo")}
+              />
+            </div>
+            <ArrowRight size={20} className="mt-[20px] text-zinc-400" />
+            <div>
+              <label htmlFor="exitTwo">Saída 2:</label>
+              <InputMask
+                disabled={!user?.infoUser}
+                id="exitTwo"
+                register={register("exitTwo")}
+                disabledInput={isHoliday}
+                watchValue={watch("exitTwo")}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between my-1">
+            <div className="flex items-center gap-2">
+              <Checkbox.Root
+                id="holiday"
+                className="bg-zinc-900 rounded-md w-3 h-3 p-3 flex justify-center items-center border border-zinc-700"
+                checked={holiday}
+                onCheckedChange={(e: boolean) => {
+                  setHoliday(e);
+                }}
+              >
+                <Checkbox.Indicator>
+                  <Check size={18} className="text-green-500" weight="bold" />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+              <label
+                htmlFor="holiday"
+                className="cursor-pointer text-zinc-200 font-bold text-md "
+              >
+                Feriado?
+              </label>
+            </div>
+
+            {isValueHasString && isHoliday && (
+              <div>
+                <button
+                  className="text-red-600 hover:brightness-125 transition-all"
+                  type="button"
+                  onClick={() => reset()}
+                >
+                  Limpar campos
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-center w-full">
+            <Button
+              type="submit"
+              disabled={
+                loading ||
+                isDateSelectedExist ||
+                (!isHoliday && watch("entryOne").length <= 4) ||
+                (!isHoliday && watch("exitOne").length <= 4) ||
+                (!isHoliday && watch("entryTwo").length <= 4) ||
+                (!isHoliday && watch("exitTwo").length <= 4)
+              }
+              classNameStyle="w-full"
+              statusColor="green"
+            >
+              {loading
+                ? "Enviando..."
+                : pointSelected
+                ? "Editar ponto"
+                : "Cadastrar novo ponto"}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

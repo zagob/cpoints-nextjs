@@ -1,12 +1,11 @@
 import dayjs from "dayjs";
 import { useTime } from "../../hooks/useTime";
-import { useIs2XL, useIsXL } from "../../utils/mediaQueryHook";
 import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 import { EmptyDataTable } from "../EmptyDataTable";
 import { ModalDeletePoint } from "../modals/ModalDeletePoint";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ModalDeletePointsSelected } from "../modals/ModalDeletePointsSelected";
 
 export interface TRowPointProps {
@@ -31,29 +30,23 @@ export interface TRowPointProps {
 }
 
 export function Table() {
-  const isQueryXL = useIsXL();
-  const isQuery2XL = useIs2XL();
   const { dataByMonth, isLoadingPoints } = useTime();
   const [checkAllPoints, setCheckAllPoints] = useState(false);
   const [checkPoints, setCheckPoints] = useState<string[]>([]);
 
-  if (isLoadingPoints) {
-    return <div>Loading...</div>;
-  }
-
-  if (dataByMonth?.points.length === 0) {
+  if (dataByMonth?.points.length === 0 || isLoadingPoints) {
     return <EmptyDataTable />;
   }
 
   return (
-    <div className="bg-zinc-800 h-[65%] flex flex-col justify-end">
+    <div className="bg-zinc-800 row-span-4 grid rounded border-2 border-zinc-700">
       <div className="flex items-center justify-between m-2">
         <h4 className="text-lg font-bold py-1">Tabela de Pontos</h4>
         {checkPoints.length > 0 && (
           <ModalDeletePointsSelected idPoints={checkPoints} />
         )}
       </div>
-      <section className="h-[100%] overflow-auto rounded relative">
+      <div className="overflow-auto">
         <table className="table-auto w-full border-collapse rounded-lg text-sm">
           <thead className="bg-slate-700 text-slate-400">
             <tr className="text-left">
@@ -139,13 +132,18 @@ export function Table() {
                       }}
                     ></Checkbox.Root>
                   </td>
-                  <td className="px-2">{isQuery2XL ? dateLg : dateMd}</td>
+                  <td className="px-2 hidden xl:block">{dateLg}</td>
+                  <td className="px-2 block xl:hidden">{dateMd}</td>
+
                   <td className="px-2">{entryOneTimeString}</td>
-                  <td className="px-2">
-                    {isQueryXL ? lunchTimeLg : lunchTimeMd}
-                  </td>
+
+                  <td className="px-2 hidden xl:block">{lunchTimeLg}</td>
+                  <td className="px-2 block xl:hidden">{lunchTimeMd}</td>
+
                   <td className="px-2">{exitTwoTimeString}</td>
-                  <td className="px-2">{totalTimeTimeString}</td>
+
+                  <td className="px-2 pr-16">{totalTimeTimeString}</td>
+
                   <td className="px-2 flex items-center gap-2">
                     {bonusTimeString}
                     <div
@@ -159,6 +157,7 @@ export function Table() {
                       })}
                     />
                   </td>
+
                   <td className="px-2">
                     <ModalDeletePoint idPoint={point.id} />
                   </td>
@@ -167,7 +166,7 @@ export function Table() {
             })}
           </tbody>
         </table>
-      </section>
+      </div>
     </div>
   );
 }

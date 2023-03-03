@@ -74,7 +74,7 @@ export function Chart() {
     },
   ];
   return (
-    <div className="bg-zinc-800 flex-1 rounded backdrop-blur-3xl py-4 h-full">
+    <div className="bg-zinc-800 row-span-2 p-4 rounded border-2 border-zinc-700">
       <ChartAp
         options={options}
         series={series}
