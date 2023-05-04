@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { ArrowRight, Check } from "phosphor-react";
 import * as Checkbox from "@radix-ui/react-checkbox";
@@ -15,6 +15,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useTime } from "../../hooks/useTime";
 import { TimeMinutesToString } from "../../utils/timeMinutesToString";
 import { Header } from "./Header";
+import { ENUM_STATUS_TIME } from "../../utils/enumStatusTime";
 
 const DataFormSchema = z.object({
   entryOne: z
@@ -44,29 +45,27 @@ const DataFormSchemaHoliday = z.object({
 
 export type DataFormProps = z.infer<typeof DataFormSchema>;
 interface ClockTimeStatusProps {
-  bonusTotalMinutesStatus: number;
   hours: string;
   minutes: string;
+  status: "UP" | "EQUAL" | "DOWN";
 }
 
-function ClockTimeStatus({
-  bonusTotalMinutesStatus,
-  hours,
-  minutes,
-}: ClockTimeStatusProps) {
-  const stylesClassBackground =
-    bonusTotalMinutesStatus === 1
-      ? "bg-green-400"
-      : bonusTotalMinutesStatus === -1
-      ? " bg-red-400"
-      : " bg-slate-400";
+function ClockTimeStatus({ hours, minutes, status }: ClockTimeStatusProps) {
+  const COLOR_STATUS_CLASS_BG = {
+    UP: "bg-green-400",
+    DOWN: "bg-red-400",
+    EQUAL: "bg-red-400",
+  };
 
-  const stylesClassText =
-    bonusTotalMinutesStatus === 1
-      ? "text-green-400 border-green-400"
-      : bonusTotalMinutesStatus === -1
-      ? "text-red-400 border-red-400"
-      : "text-slate-400 border-slate-400";
+  const COLOR_STATUS_CLASS_TEXT = {
+    UP: "text-green-400 border-green-400",
+    DOWN: "text-red-400 border-red-400",
+    EQUAL: "text-slate-400 border-slate-400",
+  };
+
+  const stylesClassBackground = COLOR_STATUS_CLASS_BG[status];
+  const stylesClassText = COLOR_STATUS_CLASS_TEXT[status];
+
   return (
     <div
       className={`border-2 w-[80px] h-[38px] flex items-center justify-center gap-1 bg-zinc-900 rounded-md relative ${stylesClassText}`}
@@ -139,6 +138,36 @@ export function AsideAddPoint() {
       : zodResolver(DataFormSchema),
   });
 
+  const formatDataTime = useMemo(() => {
+    if (dataByMonth) {
+      const { totalMinutesByMonth, points } = dataByMonth;
+
+      const disabledDays = points.map((point) => new Date(point.created_at));
+
+      const convertTotalMinutes = Math.sign(totalMinutesByMonth).toString() as
+        | "1"
+        | "-1"
+        | "0";
+      const statusTime = ENUM_STATUS_TIME[convertTotalMinutes] as
+        | "UP"
+        | "DOWN"
+        | "EQUAL";
+
+      const [hours, minutes] = TimeMinutesToString(
+        Math.abs(Number(totalMinutesByMonth))
+      ).split(":");
+
+      return {
+        statusTime,
+        hours,
+        minutes,
+        disabledDays,
+      };
+    }
+
+    return null;
+  }, [dataByMonth]);
+
   async function handleSubmitData(data: DataFormProps) {
     setLoading(true);
 
@@ -147,16 +176,6 @@ export function AsideAddPoint() {
     setHoliday(false);
     reset();
   }
-
-  const disabledDays = dataByMonth?.points.map(
-    (point) => new Date(point.created_at)
-  );
-
-  const bonusTotalMinutesStatus = Math.sign(dataByMonth?.totalMinutesByMonth!);
-
-  const [hours, minutes] = TimeMinutesToString(
-    Number(dataByMonth?.totalMinutesByMonth)
-  ).split(":");
 
   const { entryOne, entryTwo, exitOne, exitTwo } = dirtyFields;
   const isValueHasString = entryOne && entryTwo && exitOne && exitTwo;
@@ -167,11 +186,11 @@ export function AsideAddPoint() {
     <div className="bg-zinc-800 h-full relative rounded border-2 border-zinc-700 lg:w-[400px]">
       <Header />
       <div className="flex flex-col h-full justify-center items-center gap-2">
-        {!pointSelected && (
+        {formatDataTime && (
           <ClockTimeStatus
-            bonusTotalMinutesStatus={bonusTotalMinutesStatus}
-            hours={hours}
-            minutes={minutes}
+            hours={formatDataTime?.hours}
+            minutes={formatDataTime?.minutes}
+            status={formatDataTime.statusTime}
           />
         )}
         <DayPicker
@@ -184,7 +203,10 @@ export function AsideAddPoint() {
             }
             onSetDateSelected(date);
           }}
-          disabled={[{ dayOfWeek: [0, 6] }, ...(disabledDays ?? [])]}
+          disabled={[
+            { dayOfWeek: [0, 6] },
+            ...(formatDataTime?.disabledDays ?? []),
+          ]}
           modifiers={{
             available: { dayOfWeek: [1, 2, 3, 4, 5] },
           }}

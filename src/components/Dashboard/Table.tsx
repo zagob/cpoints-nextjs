@@ -39,14 +39,14 @@ export function Table() {
   }
 
   return (
-    <div className="bg-zinc-800 row-span-4 grid rounded border-2 border-zinc-700">
-      <div className="flex items-center justify-between m-2">
+    <div className="bg-zinc-800 row-span-4 flex flex-col rounded border-2 border-zinc-700 items-start">
+      <div className="flex w-full items-center justify-between p-2">
         <h4 className="text-lg font-bold py-1">Tabela de Pontos</h4>
         {checkPoints.length > 0 && (
           <ModalDeletePointsSelected idPoints={checkPoints} />
         )}
       </div>
-      <div className="overflow-auto">
+      <div className="overflow-auto flex-1 w-full">
         <table className="table-auto w-full border-collapse rounded-lg text-sm">
           <thead className="bg-slate-700 text-slate-400">
             <tr className="text-left">
